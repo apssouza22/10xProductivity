@@ -1,18 +1,18 @@
 ---
 name: confluence
 auth: sso-session
-description: Confluence wiki — search pages, fetch content, browse spaces via browser session. Use when looking up internal documentation, runbooks, architecture pages, or procedures. No API token — auth lives in the shared browser profile.
+description: Confluence wiki — search pages, fetch content, browse spaces via browser session. Use when looking up internal documentation, runbooks, architecture pages, or procedures. No API token — auth lives in the browser profile.
 env_vars:
   - CONFLUENCE_BASE_URL
 sniffer:
-  profile: ~/.browser_automation/profile
+  profile: ~/.browser_automation/confluence_profile
   url: ${CONFLUENCE_BASE_URL}
   filter: /rest/api
 ---
 
 # Confluence — browser session
 
-Confluence via the shared browser profile (`~/.browser_automation/profile/`). Other browser-session tools (Slack, Grafana, LinkedIn, etc.) use the same profile directory.
+Confluence via a persistent browser profile (`~/.browser_automation/confluence_profile/`).
 
 Env: `CONFLUENCE_BASE_URL` only (instance URL — not a secret).
 
@@ -58,7 +58,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --confluence-only
 ```
 
-Sign in through the browser if prompted — the session is saved in `~/.browser_automation/profile/`.
+Sign in through the browser if prompted — the session is saved in `~/.browser_automation/confluence_profile/`.
 
 If another tool using the same profile is already logged in, Confluence may skip the login prompt.
 
@@ -136,6 +136,6 @@ for space in (result.get("json") or {}).get("results", []):
 ## Notes
 
 - **Cloud base URL** must include `/wiki` (e.g. `https://acme.atlassian.net/wiki`).
-- **Shared profile:** same `~/.browser_automation/profile/` as other browser-session tools.
+- **Profile:** `~/.browser_automation/confluence_profile/`
 - **CQL syntax:** same as the REST API — `text~`, `title~`, `space=`, `type=page`.
 - **API token alternative:** `connection-api-token.md` if browser session REST calls return 401.

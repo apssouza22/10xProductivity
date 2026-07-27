@@ -269,7 +269,7 @@ Once trusted, this can become a scheduled workflow.
 10x-host --trigger slack-polling --workflow workflows/assistant/assistant.md --engine cursor
 ```
 
-The trigger uses the shared browser profile at `~/.browser_automation/profile/` (and `SLACK_WORKSPACE_URL` from `.env`).
+The trigger uses the Slack browser profile at `~/.browser_automation/slack_profile/` (and `SLACK_WORKSPACE_URL` from `.env`).
 
 **Early scheduled job example: stand-up prep**
 

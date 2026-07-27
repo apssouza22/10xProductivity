@@ -2,7 +2,7 @@
 Grafana browser session capture — plugin for playwright_sso.py discovery.
 
 Opens Grafana via a persistent browser profile. The grafana_session cookie
-stays in the shared browser profile at ~/.browser_automation/profile/ — not in .env.
+stays in ~/.browser_automation/grafana_profile/ — not in .env.
 Only GRAFANA_BASE_URL belongs in .env.
 
 Standalone usage:
@@ -28,8 +28,8 @@ CONFIG_ENV_KEYS = ["GRAFANA_BASE_URL"]
 
 def _profile_dir() -> Path:
     sys.path.insert(0, str(Path(__file__).parents[2]))
-    from shared_utils.browser import SHARED_BROWSER_PROFILE
-    return SHARED_BROWSER_PROFILE
+    from shared_utils.browser import profile_dir_for
+    return profile_dir_for(TOOL_NAME)
 
 
 def check(env: dict) -> bool:

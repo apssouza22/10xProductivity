@@ -5,8 +5,8 @@ Browser session refresher — discovery orchestrator.
 Discovers all tool_connections/*/sso.py plugins and delegates to them.
 Each plugin exposes: TOOL_NAME, check(env) -> bool, capture(env) -> dict.
 Optional CONFIG_ENV_KEYS lists non-secret config vars that may be written to
-.env (instance URLs, workspace URLs). Auth stays in the shared browser profile
-at ~/.browser_automation/profile/ — never in .env.
+.env (instance URLs, workspace URLs). Auth stays in each tool's browser profile
+at ~/.browser_automation/{tool}_profile/ — never in .env.
 
 Usage:
     python3 playwright_sso.py                  # refresh all expired sessions
@@ -24,10 +24,10 @@ import sys
 from pathlib import Path
 
 try:
-    from browser import DEFAULT_ENV_FILE, profile_dir_for, BROWSER_AUTOMATION_DIR, SHARED_BROWSER_PROFILE
+    from browser import DEFAULT_ENV_FILE, profile_dir_for
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
-    from browser import DEFAULT_ENV_FILE, profile_dir_for, BROWSER_AUTOMATION_DIR, SHARED_BROWSER_PROFILE
+    from browser import DEFAULT_ENV_FILE, profile_dir_for
 
 ENV_FILE = DEFAULT_ENV_FILE
 TOOL_CONNECTIONS_DIR = Path(__file__).parents[1] / "tool_connections"
@@ -121,7 +121,10 @@ def tokens_for_account(tokens: dict[str, str], account: str | None) -> dict[str,
 
 
 def profile_for_plugin(mod: object, account: str | None) -> Path:
-    return SHARED_BROWSER_PROFILE
+    tool = getattr(mod, "TOOL_NAME", None)
+    if not tool:
+        raise ValueError(f"Plugin {mod!r} missing TOOL_NAME")
+    return profile_dir_for(tool, account)
 
 
 # ---------------------------------------------------------------------------
@@ -163,7 +166,7 @@ def main():
         metavar="NAME",
         help=(
             "Account-scoped config (e.g. SLACK_ACME_WORKSPACE_URL in .env). "
-            "All accounts share the same browser profile at ~/.browser_automation/profile/."
+            "Uses a separate profile at ~/.browser_automation/{tool}_{account}_profile/."
         ),
     )
     parser.add_argument(
@@ -179,7 +182,7 @@ def main():
     args = parser.parse_args()
 
     if args.list:
-        print("Discovered SSO plugins (shared profile: ~/.browser_automation/profile/):")
+        print("Discovered SSO plugins (profiles: ~/.browser_automation/{tool}_profile/):")
         for name, mod in plugins.items():
             cfg = ", ".join(config_keys(mod)) or "(no .env config — profile only)"
             print(f"  {name:20s}  .env: {cfg}")
@@ -199,7 +202,6 @@ def main():
 
     print("Browser session refresher")
     print(f"  .env (config only): {args.env_file}")
-    print(f"  Shared auth profile: {SHARED_BROWSER_PROFILE}")
     print()
 
     for name, mod in targets.items():

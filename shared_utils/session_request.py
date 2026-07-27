@@ -8,7 +8,7 @@ automatically). Callable from CLI or imported by other Python scripts.
 
 Usage:
     python3 shared_utils/session_request.py \\
-        --profile ~/.browser_automation/profile \\
+        --profile ~/.browser_automation/linkedin_profile \\
         --warmup-url https://www.linkedin.com/feed/ \\
         --method GET \\
         --url https://www.linkedin.com/voyager/api/me \\

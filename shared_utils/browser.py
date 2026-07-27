@@ -32,7 +32,7 @@ __all__ = [
     "http_get", "http_get_no_redirect",
     "make_ssl_ctx", "urlopen",
     "DEFAULT_ENV_FILE", "TENX_PRIVATE_DIR", "private_path", "BROWSER_AUTOMATION_DIR",
-    "SHARED_BROWSER_PROFILE", "profile_dir_for",
+    "profile_dir_for",
 ]
 
 TENX_PRIVATE_DIR = Path(
@@ -52,15 +52,22 @@ DEFAULT_ENV_FILE = private_path(".env")
 # Auth tokens and cookies stay in the profile — never copy them to .env.
 BROWSER_AUTOMATION_DIR = Path.home() / ".browser_automation"
 
-# One Chromium profile for every browser-session tool. Sessions for different
-# sites share the same profile directory; logging into one tool may reuse cookies
-# for another when the instance allows it.
-SHARED_BROWSER_PROFILE = BROWSER_AUTOMATION_DIR / "profile"
+def _profile_slug(tool: str, account: str | None = None) -> str:
+    tool_part = re.sub(r"[^a-z0-9]+", "_", tool.lower()).strip("_")
+    if not tool_part:
+        raise ValueError("tool name must contain at least one letter or number")
+    if account:
+        account_part = re.sub(r"[^a-z0-9]+", "_", account.lower()).strip("_")
+        if account_part:
+            return f"{tool_part}_{account_part}_profile"
+    return f"{tool_part}_profile"
 
 
 def profile_dir_for(tool: str | None = None, account: str | None = None) -> Path:
-    """Return the shared browser profile (tool/account args kept for API compatibility)."""
-    return SHARED_BROWSER_PROFILE
+    """Return the persistent Chromium profile directory for a tool (and optional account)."""
+    if not tool:
+        raise ValueError("profile_dir_for requires a tool name")
+    return BROWSER_AUTOMATION_DIR / _profile_slug(tool, account)
 
 
 def load_env_var(key: str, default: str = "") -> str:

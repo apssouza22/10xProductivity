@@ -1,8 +1,8 @@
 """
 Confluence browser session capture — plugin for playwright_sso.py discovery.
 
-Opens Confluence via the shared browser profile. Session cookies stay in
-~/.browser_automation/profile/ — not in .env. Only CONFLUENCE_BASE_URL
+Opens Confluence via a persistent browser profile. Session cookies stay in
+~/.browser_automation/confluence_profile/ — not in .env. Only CONFLUENCE_BASE_URL
 belongs in .env.
 
 Works for Confluence Cloud (atlassian.net/wiki) and Server/Data Center with
@@ -32,8 +32,8 @@ CONFIG_ENV_KEYS = ["CONFLUENCE_BASE_URL"]
 
 def _profile_dir() -> Path:
     sys.path.insert(0, str(Path(__file__).parents[2]))
-    from shared_utils.browser import SHARED_BROWSER_PROFILE
-    return SHARED_BROWSER_PROFILE
+    from shared_utils.browser import profile_dir_for
+    return profile_dir_for(TOOL_NAME)
 
 
 def _normalize_base_url(base: str) -> str:
@@ -97,7 +97,7 @@ def _session_valid(page, base: str) -> bool:
 
 
 def capture(env: dict) -> dict:
-    """Open Confluence in the shared profile until browser sign-in succeeds."""
+    """Open Confluence in the persistent profile until browser sign-in succeeds."""
     base = _normalize_base_url(env.get("CONFLUENCE_BASE_URL", ""))
     if not base or "yourcompany" in base:
         raise RuntimeError(

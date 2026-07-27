@@ -28,14 +28,14 @@ Env: `JIRA_EMAIL`, `JIRA_API_TOKEN`, `JIRA_BASE_URL`
 ## Slack → `tool_connections/slack/connection-sso.md`
 
 Slack — two complementary modes. (1) Slack AI: post a natural-language question to the Slackbot DM and get a synthesized AI answer drawn from all Slack content. (2) search.messages: raw full-text search. Also: read channel/thread history, post messages.
-Env: `SLACK_WORKSPACE_URL` (instance URL only). Auth: shared profile `~/.browser_automation/profile/` (refresh with `python3 shared_utils/playwright_sso.py --slack-only`)
+Env: `SLACK_WORKSPACE_URL` (instance URL only). Auth: `~/.browser_automation/slack_profile/` (refresh with `python3 shared_utils/playwright_sso.py --slack-only`)
 
 ---
 
 ## Confluence → `tool_connections/confluence/connection-sso.md`
 
-Confluence wiki — search pages, fetch content, browse spaces via browser session. No API token required when using the shared profile.
-Env: `CONFLUENCE_BASE_URL` (include `/wiki` for Cloud). Auth: shared profile `~/.browser_automation/profile/` (refresh with `python3 shared_utils/playwright_sso.py --confluence-only`)
+Confluence wiki — search pages, fetch content, browse spaces via browser session. No API token required when using the browser profile.
+Env: `CONFLUENCE_BASE_URL` (include `/wiki` for Cloud). Auth: `~/.browser_automation/confluence_profile/` (refresh with `python3 shared_utils/playwright_sso.py --confluence-only`)
 
 API-token alternative: `tool_connections/confluence/connection-api-token.md`
 

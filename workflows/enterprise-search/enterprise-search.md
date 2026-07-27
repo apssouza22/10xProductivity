@@ -270,4 +270,4 @@ After all searches complete, give the user **one direct answer** — not a tool-
 - **Notion searches titles only.** Body text is not indexed by the API. A "no results" from Notion doesn't mean the knowledge isn't there — it may just not be in the page title.
 - **GitHub is expensive for non-code queries.** Skip it unless the query is clearly code-related; it adds noise and burns API rate limits.
 - **Confluence vs. Jira overlap:** Confluence has the narrative ("how it works"), Jira has the status ("is it done"). Both are worth searching for most topics.
-- **Credentials:** API-token tools load secrets from `.env`. Browser-session tools keep auth in `~/.browser_automation/profile/` — use `session_request.py` for API calls; only instance URLs belong in `.env`.
+- **Credentials:** API-token tools load secrets from `.env`. Browser-session tools keep auth in per-tool profiles under `~/.browser_automation/` — use `session_request.py` for API calls; only instance URLs belong in `.env`.

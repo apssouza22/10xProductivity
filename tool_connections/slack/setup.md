@@ -7,7 +7,7 @@ description: Set up Slack connection. Auth is browser session — no API token p
 
 ## Auth method: browser session
 
-Slack is accessed through a browser session stored in the shared profile. No API token page exists. No admin approval needed.
+Slack is accessed through a browser session stored in `~/.browser_automation/slack_profile/`. No API token page exists. No admin approval needed.
 
 **What to ask the user:** "Send me any Slack message link from your workspace (right-click any message → Copy link)."
 
@@ -29,7 +29,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --slack-only
 ```
 
-The script opens a Chromium window. Sign in through the browser if prompted. The session is saved to `~/.browser_automation/profile/` — nothing auth-related goes to `.env`.
+The script opens a Chromium window. Sign in through the browser if prompted. The session is saved to `~/.browser_automation/slack_profile/` — nothing auth-related goes to `.env`.
 
 For multiple Slack workspaces, use account-scoped keys. The account name is
 normalized to an uppercase `.env` prefix:
@@ -42,7 +42,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --slack-only --account acme
 ```
 
-That uses `SLACK_ACME_WORKSPACE_URL` in `.env` to target the acme workspace (same shared browser profile).
+That uses `SLACK_ACME_WORKSPACE_URL` in `.env` to target the acme workspace (`~/.browser_automation/slack_acme_profile/`).
 
 ---
 
@@ -64,7 +64,7 @@ print(data.get("user"), data.get("team"))
 
 ```bash
 # --- Slack ---
-# Instance URL only — auth stays in ~/.browser_automation/profile/
+# Instance URL only — auth stays in ~/.browser_automation/slack_profile/
 # Refresh session: python3 shared_utils/playwright_sso.py --slack-only
 SLACK_WORKSPACE_URL=https://yourcompany.slack.com/
 

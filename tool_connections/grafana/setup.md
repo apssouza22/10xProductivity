@@ -7,7 +7,7 @@ description: Set up Grafana connection. Auth is browser session. Only input need
 
 ## Auth method: browser session
 
-Grafana is accessed through a browser session in the shared profile. No API token page needed for instances that support web login.
+Grafana is accessed through a browser session in `~/.browser_automation/grafana_profile/`. No API token page needed for instances that support web login.
 
 **What to ask the user:** "Share your Grafana URL" (e.g. `https://grafana.acme.com`).
 
@@ -27,7 +27,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --grafana-only
 ```
 
-Sign in through the browser if prompted. Session is saved to `~/.browser_automation/profile/`.
+Sign in through the browser if prompted. Session is saved to `~/.browser_automation/grafana_profile/`.
 
 ---
 
@@ -53,7 +53,7 @@ print(result.get("json"))
 
 ```bash
 # --- Grafana ---
-# Instance URL only — auth stays in ~/.browser_automation/profile/
+# Instance URL only — auth stays in ~/.browser_automation/grafana_profile/
 # Refresh session: python3 shared_utils/playwright_sso.py --grafana-only
 GRAFANA_BASE_URL=https://grafana.yourcompany.com
 ```
