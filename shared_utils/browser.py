@@ -36,7 +36,7 @@ __all__ = [
 ]
 
 TENX_PRIVATE_DIR = Path(
-    os.environ.get("TENX_PRIVATE_DIR", Path.home() / ".incident-investigator-agent")
+    os.environ.get("TENX_PRIVATE_DIR", Path.home() / ".auto-pilot-agent")
 ).expanduser()
 
 

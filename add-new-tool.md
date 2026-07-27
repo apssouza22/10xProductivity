@@ -118,7 +118,7 @@ submit through a normal authenticated UI when `session_request.py` or a captured
 **Browser-session-only tools:** If the tool has no API token path and only supports signing in through a browser, browser session capture is the option. This is fine — but do three things:
 
 1. Write a plugin-compliant `sso.py` in `TENX_PRIVATE_DIR/personal/{tool-name}/` (not `tool_connections/`) with `TOOL_NAME`, `check(env) -> bool`, and `capture(env) -> dict`. `capture()` ensures the user is logged in via the shared profile at `~/.browser_automation/profile/` and returns only config keys listed in `CONFIG_ENV_KEYS` (if any).
-2. Document the refresh command in the connection file: `python3 "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal/{tool-name}/sso.py"` — the agent cannot self-refresh without the user present.
+2. Document the refresh command in the connection file: `python3 "${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/{tool-name}/sso.py"` — the agent cannot self-refresh without the user present.
 3. Document the token TTL (usually ~8h) — so the user knows when to expect re-authentication prompts.
 
 **Prefer replayable APIs when they exist; keep browser operation when the UI is

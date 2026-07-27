@@ -27,7 +27,7 @@ URL="$2"
 # Load BANNED_TERM from TENX_PRIVATE_DIR/.env — never committed as a literal
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || echo "$SCRIPT_DIR/..")"
-TENX_PRIVATE_DIR="${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}"
+TENX_PRIVATE_DIR="${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}"
 ENV_FILE="$TENX_PRIVATE_DIR/.env"
 BANNED_TERM=""
 SKIP_AI_REVIEW=""

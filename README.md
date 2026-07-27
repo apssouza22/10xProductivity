@@ -1,30 +1,20 @@
-# 10xProductivity — Personal AI Assistant for Work, Built on Coding Agents
+# Auto Pilot Agent
 
-**A local-first stack for building a personal AI assistant for work inside real corporate constraints.**
+**A local-first stack for building a personal AI assistant to assist you in your daily work.**
 
-Use the coding agents, browser sessions, desktop apps, notifications, and tool access you already have. No new company-wide automation platform, no admin-approved Slack app, no webhooks, and no IT project required.
+Use the coding agents, browser sessions, desktop apps and tool access you already have. 
+No new company-wide automation platform, no admin-approved Slack app, no webhooks, and no IT project required.
 
-[![GitHub Stars](https://img.shields.io/github/stars/ZhixiangLuo/incident-investigator-agent?style=social)](https://github.com/ZhixiangLuo/incident-investigator-agent/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/apssouza22/auto-pilot-agent?style=social)](https://github.com/apssouza22/auto-pilot-agent/stargazers)
 
 If this saves you time, consider giving it a star. It helps others discover the project.
 
-## Star History
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=ZhixiangLuo%2F10xProductivity&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ZhixiangLuo/incident-investigator-agent&type=date&theme=dark&legend=top-left&sealed_token=QfW1emsXrddzjk2Yk4Oq2wVOHeQCCxXeGnIQpTkCYF3NNXVoQUmQzruCIgo6bi1vdVBHsmF8x-0_OPo3QHotCGURIy_ErDTb5Q2aRLJHM6iHzxMJiGwUkmkqxSKGSYPiyUaUWfDthv8UanPpIB8UCxBftdlFBH_ceUZEVG0KDpFXuWF1Qb0DPYhNkUp4" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ZhixiangLuo/incident-investigator-agent&type=date&legend=top-left&sealed_token=QfW1emsXrddzjk2Yk4Oq2wVOHeQCCxXeGnIQpTkCYF3NNXVoQUmQzruCIgo6bi1vdVBHsmF8x-0_OPo3QHotCGURIy_ErDTb5Q2aRLJHM6iHzxMJiGwUkmkqxSKGSYPiyUaUWfDthv8UanPpIB8UCxBftdlFBH_ceUZEVG0KDpFXuWF1Qb0DPYhNkUp4" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ZhixiangLuo/incident-investigator-agent&type=date&legend=top-left&sealed_token=QfW1emsXrddzjk2Yk4Oq2wVOHeQCCxXeGnIQpTkCYF3NNXVoQUmQzruCIgo6bi1vdVBHsmF8x-0_OPo3QHotCGURIy_ErDTb5Q2aRLJHM6iHzxMJiGwUkmkqxSKGSYPiyUaUWfDthv8UanPpIB8UCxBftdlFBH_ceUZEVG0KDpFXuWF1Qb0DPYhNkUp4" />
- </picture>
-</a>
-
 ## The Idea
 
-Most employees cannot install a new automation platform, register Slack or GitHub apps, add webhooks, or wait for IT approval every time they want an AI agent to help.
+Most employees cannot install a new automation platform, register Slack or GitHub apps, add webhooks, or wait for 
+IT approval every time they want an AI agent to help.
 
-10xProductivity builds around the access you already have:
+Auto Pilot Agent builds around the access you already have:
 
 - your coding agent
 - your browser and desktop apps
@@ -33,7 +23,9 @@ Most employees cannot install a new automation platform, register Slack or GitHu
 - your existing permissions
 - your app notifications, messages, and calendar events
 
-Coding agents are no longer just coding assistants. Cursor, Claude Code, Codex, Copilot, and similar tools can read files, run scripts, call APIs, use browsers, and work across your local environment. 10xProductivity turns that agent into a personal work assistant that can operate within normal workplace constraints.
+Coding agents are no longer just coding assistants. Cursor, Claude Code, Codex, Copilot, and similar tools can read files, 
+run scripts, call APIs, use browsers, and work across your local environment. 
+Auto Pilot Agent turns that agent into a personal work assistant that can operate within normal workplace constraints.
 
 The shift is not "let an AI run autonomously." The shift is **human-AI interaction**:
 
@@ -45,7 +37,8 @@ The shift is not "let an AI run autonomously." The shift is **human-AI interacti
 - Mistakes and tool use become better skills.
 - Trusted skills become workflows you can launch from triggers, schedules, or your laptop.
 
-Tool connections are still the foundation, but they are no longer the whole product. They are the first layer of a broader personal AI assistant for work stack.
+Tool connections are still the foundation, but they are no longer the whole product. 
+They are the first layer of a broader personal AI assistant for work stack.
 
 ## Available Today / Coming Next
 
@@ -53,11 +46,6 @@ Tool connections are still the foundation, but they are no longer the whole prod
 |---|---|---|
 | Tool connections | Available today | Pre-built recipes for 25+ tools, plus a playbook for connecting any internal or custom tool |
 | Enterprise search | Available today | Search across connected tools like Slack, Confluence, Jira, GitHub, Linear, Notion, and more |
-| Agent skills | Available today | Packaged Cursor and Claude Code skills for tool setup, search, workflow creation, UI discovery, and more |
-| Triggers | Early | Reusable event listeners that detect app and service events, then wake up workflows and automations |
-| Runtime | Early | Local execution machinery for polling, scheduling, state, replies, and coding-agent invocation |
-| Reusable workflows | Early | Enterprise search and stand-up prep exist today; future examples include automatic PR review and morning brief |
-| Learning and memory | Roadmap | Scheduled reflection, capability learning, and durable memory are planned but not complete |
 
 ## How It Works
 
@@ -79,7 +67,7 @@ Work done in Slack, Jira, GitHub, docs, calendar, CRM, internal portals, and mor
 
 Your agent needs access to the same tools you already use: Slack, Jira, GitHub, Confluence, Google Drive, Outlook, Salesforce, internal portals, or anything else with an API, CLI, browser surface, or local files.
 
-10xProductivity provides agent-readable setup guides in [`tool_connections/`](tool_connections/). The core principle is still zero new infrastructure: your local coding agent acts as you, using your existing access.
+Auto Pilot Agent provides agent-readable setup guides in [`tool_connections/`](tool_connections/). The core principle is still zero new infrastructure: your local coding agent acts as you, using your existing access.
 
 For the detailed connection philosophy, see [`tool_connections/README.md`](tool_connections/README.md).
 
@@ -161,7 +149,7 @@ setup-python.md          Python and Playwright setup helper
 Private runtime state lives outside the public repo by default:
 
 ```text
-~/.incident-investigator-agent/
+~/.auto-pilot-agent/
   .env                    Tokens, cookies, and private config
   personal/               Your active private tool recipes and patched copies
   verified_connections.md Device-specific connection index
@@ -170,7 +158,7 @@ Private runtime state lives outside the public repo by default:
 
 Set `TENX_PRIVATE_DIR` if you want a different private directory. The repo keeps hooks and `.gitignore` as safety nets, but credentials and browser/session state should not live under the repo tree.
 
-Migration note: older local instructions may point at `/path/to/incident-investigator-agent/.env`, `/path/to/incident-investigator-agent/personal/`, or `/path/to/incident-investigator-agent/verified_connections.md`. Those now map to `TENX_PRIVATE_DIR/.env`, `TENX_PRIVATE_DIR/personal/`, and `TENX_PRIVATE_DIR/verified_connections.md`. The repo `personal/` folder is only a placeholder with this reminder.
+Migration note: older local instructions may point at `/path/to/auto-pilot-agent/.env`, `/path/to/auto-pilot-agent/personal/`, or `/path/to/auto-pilot-agent/verified_connections.md`. Those now map to `TENX_PRIVATE_DIR/.env`, `TENX_PRIVATE_DIR/personal/`, and `TENX_PRIVATE_DIR/verified_connections.md`. The repo `personal/` folder is only a placeholder with this reminder.
 
 The current repo is strongest at the connection layer. The trigger, runtime, and workflow layers now exist, but are still early. The next product direction is to harden enterprise-friendly triggers, promote more workflows, and make runtime execution reliable without requiring enterprise app installs or new infrastructure.
 
@@ -203,8 +191,8 @@ Packaged skills currently cover [tool setup](.cursor/skills/tool-connector/SKILL
 2. Clone and open this repo:
 
 ```bash
-git clone https://github.com/ZhixiangLuo/incident-investigator-agent.git
-cd 10xProductivity
+git clone https://github.com/apssouza22/auto-pilot-agent.git
+cd auto-pilot-agent
 ```
 
 3. If needed, set up Python and Playwright:
@@ -303,7 +291,7 @@ The agent returns a review summary or draft comment for approval.
 
 ## Who This Is For
 
-10xProductivity is for people who already use a coding agent and want it to become useful outside the code editor:
+Auto Pilot Agent is for people who already use a coding agent and want it to become useful outside the code editor:
 
 - Developers who want one agent to work across code, tickets, docs, and chat
 - Engineering managers who want cross-tool status and follow-up automation
@@ -314,7 +302,7 @@ The same stack works differently for each person because the tools, skills, and 
 
 ## Project Direction
 
-10xProductivity started as the tool connection layer for coding agents. It is evolving into an open-source personal AI assistant for work stack:
+Auto Pilot Agent started as the tool connection layer for coding agents. It is evolving into an open-source personal AI assistant for work stack:
 
 1. **Tool connections** — let the agent use the tools you already use.
 2. **Triggers** — detect incoming work through app and service events the user already receives.

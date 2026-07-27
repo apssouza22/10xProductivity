@@ -12,7 +12,7 @@ Most "AI integration" approaches ask you to:
 - Wait for admin provisioning
 - Accept new attack surfaces and vendor lock-in
 
-**10xProductivity flips this completely.**
+**Auto Pilot Agent flips this completely.**
 
 Apps are built for humans on laptops. Browsers, CLIs, REST APIs — they're all already there. Your agent uses the same surface. No company-wide integration layer, no middleware, no new permissions.
 
@@ -37,7 +37,7 @@ No OAuth app approval. No IT ticket. No staging environment. If you can log in, 
 
 Most AI tools — enterprise search platforms, knowledge bases, even ChatGPT — are **read-only**. They find information and surface it in a chat box. You then manually take that answer and do something with it.
 
-10xProductivity is **read + write + act**. The agent doesn't just find the Jira ticket — it can update it when the workflow calls for that. It doesn't just summarize the Slack thread — it can post the summary back. It doesn't just locate the bug — it can open the PR that fixes it.
+Auto Pilot Agent is **read + write + act**. The agent doesn't just find the Jira ticket — it can update it when the workflow calls for that. It doesn't just summarize the Slack thread — it can post the summary back. It doesn't just locate the bug — it can open the PR that fixes it.
 
 The output isn't text in a box. The output is the thing done, in the right place, in the right tool.
 
@@ -91,7 +91,7 @@ The agent fans out across every connected tool, pulls relevant results, and retu
 
 **When to use it:** Any time you're asking a question that might be answered in more than one place — "what was the decision on X", "who owns Y", "is there a doc on Z", "any context on this incident", "what did we decide about this feature".
 
-To activate: `Read /path/to/incident-investigator-agent/workflows/enterprise-search/enterprise-search.md`
+To activate: `Read /path/to/auto-pilot-agent/workflows/enterprise-search/enterprise-search.md`
 
 ---
 
@@ -130,18 +130,18 @@ setup-python.md      ← detect OS, try winget/brew/apt then python.org if neede
 1. **Install Cursor** (the editor your agent runs in): open **[cursor.com/download](https://cursor.com/download)**, download the installer for **Windows** or **macOS**, run it, and sign in or create an account when prompted.
 
 ```bash
-git clone https://github.com/ZhixiangLuo/incident-investigator-agent.git
-cd 10xProductivity
+git clone https://github.com/apssouza22/auto-pilot-agent.git
+cd auto-pilot-agent
 ```
 
-Open the **`10xProductivity`** folder in Cursor (**File → Open Folder…**).
+Open the **`auto-pilot-agent`** folder in Cursor (**File → Open Folder…**).
 
 If you do not have **Python 3** yet (common on a fresh laptop), point your agent at **`setup-python.md`** first — it detects your system, tries **winget / Homebrew / apt** when present, otherwise guides a **python.org** install, then prepares `.venv` + Playwright. **No `git` in that playbook** — you already have this folder.
 
 Then point your agent at the setup guide:
 
 ```
-Read /path/to/incident-investigator-agent/setup.md and set up my tool connections.
+Read /path/to/auto-pilot-agent/setup.md and set up my tool connections.
 ```
 
 Your agent handles the rest — it will ask which tools you use and the URLs, get the credentials it needs, run SSO where required, and verify each connection works. Works for any tool: pre-built recipes for common tools, and an identical setup path for internal or custom tools.
@@ -151,7 +151,7 @@ Your agent handles the rest — it will ask which tools you use and the URLs, ge
 ## Who uses this layer and how
 
 **User** — you want to connect your agent to tools you already use:
-1. Clone the repo and point your agent at it: *"Read /path/to/incident-investigator-agent/setup.md and set up my tool connections"*
+1. Clone the repo and point your agent at it: *"Read /path/to/auto-pilot-agent/setup.md and set up my tool connections"*
 2. Your agent asks which tools you use, handles credentials, runs SSO where needed, and verifies each connection
 3. From that point your tools and the search workflow are available automatically at the start of every session — no MCP server, no plugin, no admin approval
 

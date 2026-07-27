@@ -1,15 +1,15 @@
 ---
 name: tool-connector
 description: Connect any tool you use at work to your agent — including internal company tools, custom-built systems, deployment portals, incident trackers, internal knowledge bases, HR systems, and commercial tools like Slack, Confluence, Jira, Linear, GitHub, Outlook, Datadog, and PagerDuty. Use when the user wants to set up a tool connection, connect an internal or custom-built tool, or add a new tool integration from scratch.
-source: https://github.com/zhixiangluo/incident-investigator-agent
-author: zhixiangluo
+source: https://github.com/apssouza22/auto-pilot-agent
+author: apssouza22
 ---
 
 # Tool Connector — Connect Any Work Tool to Your Agent
 
 > **Requires the repo cloned locally.** Check if it's already present (`ls setup.md`), then read `setup.md` — that is the full entry point. The sections below summarize the approach for reference.
 
-Full methodology and pre-built recipes: https://github.com/apssouza22/incident-investigator-agent
+Full methodology and pre-built recipes: https://github.com/apssouza22/auto-pilot-agent
 
 ## Internal tools are first-class citizens
 
