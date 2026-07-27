@@ -154,22 +154,3 @@ Your agent handles the rest — it will ask which tools you use and the URLs, ge
 1. Clone the repo and point your agent at it: *"Read /path/to/auto-pilot-agent/setup.md and set up my tool connections"*
 2. Your agent asks which tools you use, handles credentials, runs SSO where needed, and verifies each connection
 3. From that point your tools and the search workflow are available automatically at the start of every session — no MCP server, no plugin, no admin approval
-
-**Contributor** — you want to add a new tool or improve an existing connection:
-1. Ask your agent: *"Load add-new-tool.md and add a connection for [Tool]"*
-2. The skill walks through: research auth → ask URL first → try the most likely auth → ask only for missing credentials → validate → write → PR (contribution is optional and only for commercial tools)
-3. Community files (`staging/`) have a lower bar; core (`tool_connections/`) requires multi-environment validation
-
----
-
-## Contributing
-
-Contributions are welcome for:
-- **New tool** — a tool not yet in the repo
-- **New auth variant** — a different auth method for an existing tool (e.g. AD SSO vs API token)
-- **New deployment variant** — e.g. Jira Server vs Jira Cloud
-- **Improvement to an existing connection** — fixing broken snippets, adding missing endpoints, updating stale auth
-
-If something doesn't work or you want to request a new tool, open an issue.
-
-See [../contributing.md](../contributing.md) for the full process. The core rule: **run before you write.** Every snippet must be code you actually executed and saw succeed. No copy-paste from docs.

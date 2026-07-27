@@ -163,7 +163,7 @@ pwd
 # → /absolute/path/to/auto-pilot-agent
 ```
 
-Create the skill file at `~/.cursor/skills/tool-connections/SKILL.md` with that path filled in:
+Create the skill file at `~/.agents/skills/tool-connections/SKILL.md` with that path filled in:
 
 ```markdown
 ---
@@ -200,8 +200,8 @@ Replace every occurrence of `/absolute/path/to/auto-pilot-agent` with the actual
 Create the directory and write the file:
 
 ```bash
-mkdir -p ~/.cursor/skills/tool-connections
-# then write the file above to ~/.cursor/skills/tool-connections/SKILL.md
+mkdir -p ~/.agents/skills/tool-connections
+# then write the file above to ~/.agents/skills/tool-connections/SKILL.md
 ```
 
 Once written, the skill is active. Cursor and Claude Code will load `verified_connections.md` and the search workflow automatically at the start of every session.

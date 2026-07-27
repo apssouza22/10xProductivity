@@ -138,9 +138,8 @@ triggers/                Event listeners that wake up workflows and automations
 runtime/                 Local execution machinery: scheduling, state, replies, agent clients
 workflows/               Multi-tool workflows built on top of connections
 tests/                   Regression tests for triggers, runtime, and workflows
-.cursor/skills/          Cursor agent skills packaged with the repo
+.agents/skills/          Cursor agent skills packaged with the repo
 .claude/skills/          Claude Code agent skills packaged with the repo
-staging/                 Community contributions under review
 setup.md                 Main setup path for connecting tools
 add-new-tool.md          Playbook for connecting tools not yet in the repo
 setup-python.md          Python and Playwright setup helper
@@ -182,7 +181,7 @@ Internal portals and custom company tools matter just as much as commercial SaaS
 
 Agent skills sit above raw tool connections. They teach your coding agent how to do work, not just how to call an API.
 
-Packaged skills currently cover [tool setup](.cursor/skills/tool-connector/SKILL.md), [enterprise search](.cursor/skills/enterprise-search/SKILL.md), [workflow creation](.cursor/skills/create-workflow/SKILL.md), [colleague distillation](.cursor/skills/colleague-distillation/SKILL.md), and the [assistant inbox/runtime](.cursor/skills/assistant-orchestrator/SKILL.md).
+Packaged skills currently cover [tool setup](.agents/skills/tool-connector/SKILL.md), [enterprise search](.agents/skills/enterprise-search/SKILL.md), [workflow creation](.agents/skills/create-workflow/SKILL.md), [colleague distillation](.agents/skills/colleague-distillation/SKILL.md), and the [assistant inbox/runtime](.agents/skills/assistant-orchestrator/SKILL.md).
 
 ## Quick Start
 
