@@ -142,8 +142,8 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install playwright
 playwright install chromium
-mkdir -p "${TENX_PRIVATE_DIR:-$HOME/.10xProductivity}/personal"
-touch "${TENX_PRIVATE_DIR:-$HOME/.10xProductivity}/.env"
+mkdir -p "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal"
+touch "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/.env"
 ```
 
 If `python3` is too old but `python3.12` exists:
@@ -162,8 +162,8 @@ py -3 -m venv .venv
 python -m pip install --upgrade pip
 pip install playwright
 playwright install chromium
-if not exist "%USERPROFILE%\\.10xProductivity\\personal" mkdir "%USERPROFILE%\\.10xProductivity\\personal"
-type nul > "%USERPROFILE%\\.10xProductivity\\.env"
+if not exist "%USERPROFILE%\\.incident-investigator-agent\\personal" mkdir "%USERPROFILE%\\.incident-investigator-agent\\personal"
+type nul > "%USERPROFILE%\\.incident-investigator-agent\\.env"
 ```
 
 PowerShell activation (if execution policy allows):
@@ -196,7 +196,7 @@ Then continue with **`setup.md`** — tool SSO scripts and verify snippets expec
 - [ ] `.venv/` exists and activates without error
 - [ ] `pip show playwright` shows an installed version
 - [ ] `playwright install chromium` completed
-- [ ] Empty private `.env` exists at `${TENX_PRIVATE_DIR:-$HOME/.10xProductivity}/.env` (or existing file preserved)
+- [ ] Empty private `.env` exists at `${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/.env` (or existing file preserved)
 
 ---
 

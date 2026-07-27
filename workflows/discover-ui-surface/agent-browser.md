@@ -92,7 +92,7 @@ profile** for that identity or site class. Reuse it with Agent Browser instead o
 starting from a blank profile or raw headless Playwright (many SaaS signup pages
 block headless automation).
 
-Read `~/.10xProductivity/verified_connections.md` and list
+Read `~/.incident-investigator-agent/verified_connections.md` and list
 `~/.browser_automation/*_cdp_profile` when the task needs Google, Drive, or
 another tool that already has a dedicated profile.
 

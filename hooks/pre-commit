@@ -9,7 +9,7 @@
 
 set -euo pipefail
 
-TENX_PRIVATE_DIR="${TENX_PRIVATE_DIR:-$HOME/.10xProductivity}"
+TENX_PRIVATE_DIR="${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}"
 ENV_FILE="$TENX_PRIVATE_DIR/.env"
 BANNED_TERM=""
 if [[ -f "$ENV_FILE" ]]; then

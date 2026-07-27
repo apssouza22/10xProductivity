@@ -42,30 +42,13 @@ Never edit `tool_connections/` directly — copy to `personal/{tool}/` and patch
 | 1 | API token | ~30s — generate in tool settings |
 | 2 | Browser session (SSO, cached) | Run once — session cached for days/weeks |
 | 3 | Browser session (per operation) | Playwright on every call — only if no API exists |
-| 4 | Username + password | Legacy tools only |
-| ✗ | OAuth requiring user to create their own app | Never — too much friction |
 
 ## Pre-built recipes available
 
-Slack, Confluence, Jira, Linear, GitHub, Microsoft Teams, Outlook, Google Drive, Datadog, Grafana, PagerDuty, Jenkins, Backstage, Bitbucket Server, Artifactory.
+Slack, Confluence, Jira, GitHub, Kibana.
 
 Internal and custom tools follow the same path — they stay private in `personal/` (gitignored).
 
 ## Getting started
-
-First, check if you already have the repo:
-
-```bash
-ls setup.md 2>/dev/null && echo "repo present" || echo "need to clone"
-```
-
-**Repo present** → if `python3` (or Windows `py -3`) is missing or `.venv` is not set up for Playwright, read **`setup-python.md`** first; then read **`setup.md`** — it is the full entry point for tool connections.
-
-**Need to clone** →
-
-```bash
-git clone https://github.com/zhixiangluo/incident-investigator-agent.git
-cd 10xProductivity
-```
 
 Then read `setup.md`. It routes to pre-built recipes, your own recipes, and `add-new-tool.md` for anything new.

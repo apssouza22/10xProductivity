@@ -21,7 +21,7 @@ Check what's in your `TENX_PRIVATE_DIR/personal/` folder vs what's already in `t
 
 ```bash
 # What you have personally
-ls "${TENX_PRIVATE_DIR:-$HOME/.10xProductivity}/personal/"
+ls "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal/"
 
 # What the community already has
 ls tool_connections/
@@ -95,7 +95,7 @@ Go through every file in `TENX_PRIVATE_DIR/personal/{tool-name}/` and remove any
 ## Step 4: Copy to staging
 
 ```bash
-cp -r "${TENX_PRIVATE_DIR:-$HOME/.10xProductivity}/personal/{tool-name}/" staging/{tool-name}/
+cp -r "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal/{tool-name}/" staging/{tool-name}/
 ```
 
 The `staging/` folder is the holding area for community review. Use `staging/_example/` as a reference for the expected file format and frontmatter fields.
