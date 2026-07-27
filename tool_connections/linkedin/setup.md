@@ -51,7 +51,7 @@ python3 personal/linkedin/sso.py --force
 ```python
 import sys, time
 from pathlib import Path
-sys.path.insert(0, "tool_connections")
+sys.path.insert(0, ".")
 from shared_utils.browser import sync_playwright, DEFAULT_ENV_FILE, load_env_file
 
 PROFILE_DIR = Path.home() / ".browser_automation" / "linkedin_profile"

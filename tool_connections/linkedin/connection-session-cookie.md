@@ -38,7 +38,7 @@ All Voyager API calls are made from within a Playwright page context (injecting 
 ```python
 import sys, time
 from pathlib import Path
-sys.path.insert(0, "tool_connections")
+sys.path.insert(0, ".")
 from shared_utils.browser import sync_playwright, DEFAULT_ENV_FILE, load_env_file
 
 PROFILE_DIR = Path.home() / ".browser_automation" / "linkedin_profile"

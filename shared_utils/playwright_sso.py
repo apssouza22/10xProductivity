@@ -36,7 +36,7 @@ except ImportError:
     from browser import DEFAULT_ENV_FILE
 
 ENV_FILE = DEFAULT_ENV_FILE
-TOOL_CONNECTIONS_DIR = Path(__file__).parents[1]
+TOOL_CONNECTIONS_DIR = Path(__file__).parents[1] / "tool_connections"
 
 
 # ---------------------------------------------------------------------------

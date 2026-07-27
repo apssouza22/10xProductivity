@@ -67,7 +67,7 @@ agent-browser click @e3
 agent-browser snapshot -i
 ```
 
-Use Agent Browser before heavier capture when the question is "what is visible?" or "which control should I click?" Do not write `@eN` refs into durable recipes; they are page-instance specific. If the task requires reusable API calls, escalate to Mode C or `tool_connections/shared_utils/traffic_sniffer.py`.
+Use Agent Browser before heavier capture when the question is "what is visible?" or "which control should I click?" Do not write `@eN` refs into durable recipes; they are page-instance specific. If the task requires reusable API calls, escalate to Mode C or `shared_utils/traffic_sniffer.py`.
 
 ---
 

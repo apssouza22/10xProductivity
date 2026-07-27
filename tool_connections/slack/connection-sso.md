@@ -11,11 +11,11 @@ env_vars:
 
 Access is via your own user session (`xoxc` client token) extracted after SSO — no Slack app installation or admin approval needed.
 
-Env: `SLACK_XOXC`, `SLACK_D_COOKIE` (long-lived user session; refresh via `python3 tool_connections/shared_utils/playwright_sso.py --slack-only` only when the session stops working)
+Env: `SLACK_XOXC`, `SLACK_D_COOKIE` (long-lived user session; refresh via `python3 shared_utils/playwright_sso.py --slack-only` only when the session stops working)
 
 Multiple Slack workspaces are supported with account-scoped env keys:
 `SLACK_ACME_WORKSPACE_URL`, `SLACK_ACME_XOXC`, `SLACK_ACME_D_COOKIE`
-(refresh via `python3 tool_connections/shared_utils/playwright_sso.py --slack-only --account acme`).
+(refresh via `python3 shared_utils/playwright_sso.py --slack-only --account acme`).
 
 ---
 
@@ -43,7 +43,7 @@ Extract workspace URL (`https://acme.slack.com/`), update `SLACK_WORKSPACE_URL` 
 
 ```bash
 source .venv/bin/activate
-python3 tool_connections/shared_utils/playwright_sso.py --slack-only
+python3 shared_utils/playwright_sso.py --slack-only
 ```
 
 The script opens Chromium, completes SSO, and writes `SLACK_XOXC` and `SLACK_D_COOKIE` to `.env` automatically.
@@ -55,7 +55,7 @@ For a second workspace, set a scoped URL and refresh with `--account`:
 SLACK_ACME_WORKSPACE_URL=https://acme.slack.com/
 
 source .venv/bin/activate
-python3 tool_connections/shared_utils/playwright_sso.py --slack-only --account acme
+python3 shared_utils/playwright_sso.py --slack-only --account acme
 ```
 
 The account name becomes an uppercase prefix, so this writes
@@ -66,13 +66,13 @@ The account name becomes an uppercase prefix, so this writes
 The account-scoped flow was verified against two Slack workspaces:
 
 ```text
-$ python3 tool_connections/shared_utils/playwright_sso.py --slack-only
+$ python3 shared_utils/playwright_sso.py --slack-only
 # → slack: ok
 # → auth.test: ok=True, team=primary-workspace, user=alice
 # → conversations.open: ok=True, channel=D0123456789
 # → chat.postMessage: ok=True
 
-$ python3 tool_connections/shared_utils/playwright_sso.py --slack-only --account sideproject
+$ python3 shared_utils/playwright_sso.py --slack-only --account sideproject
 # → slack:sideproject: ok
 # → auth.test: ok=True, team=sideproject-workspace, user=alice
 # → conversations.open: ok=True, channel=D9876543210

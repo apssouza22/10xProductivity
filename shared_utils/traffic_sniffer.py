@@ -40,10 +40,10 @@ Workflow:
 Usage:
     # Shortcut — reads defaults from a linkedin connection-*.md:
     source .venv/bin/activate
-    python3 tool_connections/shared_utils/traffic_sniffer.py --tool linkedin
+    python3 shared_utils/traffic_sniffer.py --tool linkedin
 
     # Explicit — full control:
-    python3 tool_connections/shared_utils/traffic_sniffer.py \\
+    python3 shared_utils/traffic_sniffer.py \\
         --profile ~/.browser_automation/linkedin_profile \\
         --url https://www.linkedin.com/feed/ \\
         --filter /voyager/api \\
@@ -61,10 +61,10 @@ Usage:
     # Heavy pages (e.g. LinkedIn feed): response bodies are OFF by default so the
     # sync handler does not block the driver while reading multi‑MB JS bundles.
     # Opt in when you need response payloads:
-    python3 tool_connections/shared_utils/traffic_sniffer.py --tool linkedin --capture-bodies
+    python3 shared_utils/traffic_sniffer.py --tool linkedin --capture-bodies
 
 Usage (as a library):
-    from tool_connections.shared_utils.traffic_sniffer import sniff
+    from shared_utils.traffic_sniffer import sniff
 
     sniff(
         profile_dir=Path.home() / ".browser_automation" / "linkedin_profile",
@@ -97,10 +97,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-sys.path.insert(0, str(Path(__file__).parents[2]))
-from tool_connections.shared_utils.browser import TENX_PRIVATE_DIR, sync_playwright
+sys.path.insert(0, str(Path(__file__).parents[1]))
+from shared_utils.browser import TENX_PRIVATE_DIR, sync_playwright
 
-_REPO_ROOT = Path(__file__).parents[2]
+_REPO_ROOT = Path(__file__).parents[1]
 
 
 def _display_path(path: Path) -> str:

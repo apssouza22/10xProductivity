@@ -130,7 +130,7 @@ def make_ssl_ctx(verify: bool = True) -> ssl.SSLContext:
     Zscaler intercepts HTTPS and Python does not trust the local root CA).
 
     Usage in any connection file or sso.py:
-        from tool_connections.shared_utils.browser import urlopen
+        from shared_utils.browser import urlopen
         with urlopen(req, timeout=15) as r: ...
 
     If you need a raw context:

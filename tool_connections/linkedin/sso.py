@@ -23,7 +23,7 @@ import sys
 import time
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parents[2] / "tool_connections"))
+sys.path.insert(0, str(Path(__file__).parents[2]))
 from shared_utils.browser import (
     sync_playwright,
     load_env_file,

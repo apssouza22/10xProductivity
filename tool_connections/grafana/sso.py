@@ -105,7 +105,7 @@ if __name__ == "__main__":
     import argparse
     from pathlib import Path
 
-    sys.path.insert(0, str(Path(__file__).parents[2] / "tool_connections"))
+    sys.path.insert(0, str(Path(__file__).parents[2]))
     from shared_utils.browser import DEFAULT_ENV_FILE
 
     ENV_FILE = DEFAULT_ENV_FILE

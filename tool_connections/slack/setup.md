@@ -26,7 +26,7 @@ That is the only input needed. Everything else is automated.
 
 ```bash
 source .venv/bin/activate
-python3 tool_connections/shared_utils/playwright_sso.py --slack-only
+python3 shared_utils/playwright_sso.py --slack-only
 ```
 
 The script opens a Chromium window. On managed machines with enterprise SSO it completes automatically (~20s). On personal machines, the user logs in once through the browser. Tokens are written to `.env` automatically.
@@ -39,7 +39,7 @@ normalized to an uppercase `.env` prefix:
 SLACK_ACME_WORKSPACE_URL=https://acme.slack.com/
 
 source .venv/bin/activate
-python3 tool_connections/shared_utils/playwright_sso.py --slack-only --account acme
+python3 shared_utils/playwright_sso.py --slack-only --account acme
 ```
 
 That writes `SLACK_ACME_XOXC` and `SLACK_ACME_D_COOKIE` without replacing the
@@ -69,7 +69,7 @@ print(r.get("user"), r.get("team"))
 
 ```bash
 # --- Slack ---
-# Short-lived (~8h) — refresh with: python3 tool_connections/shared_utils/playwright_sso.py --slack-only
+# Short-lived (~8h) — refresh with: python3 shared_utils/playwright_sso.py --slack-only
 SLACK_WORKSPACE_URL=https://yourcompany.slack.com/
 SLACK_XOXC=your-slack-client-token
 SLACK_D_COOKIE=your-slack-d-cookie-value
@@ -86,10 +86,10 @@ SLACK_ACME_D_COOKIE=your-acme-d-cookie-value
 
 ```bash
 source .venv/bin/activate
-python3 tool_connections/shared_utils/playwright_sso.py --slack-only
+python3 shared_utils/playwright_sso.py --slack-only
 
 # Refresh a named workspace/account:
-python3 tool_connections/shared_utils/playwright_sso.py --slack-only --account acme
+python3 shared_utils/playwright_sso.py --slack-only --account acme
 ```
 
 Token TTL: ~8h. Re-run when `auth.test` returns `ok=False`.
@@ -100,13 +100,13 @@ The default and account-scoped flows were both tested with real Slack sessions
 and scrubbed output:
 
 ```text
-$ python3 tool_connections/shared_utils/playwright_sso.py --slack-only
+$ python3 shared_utils/playwright_sso.py --slack-only
 # → slack: ok
 # → auth.test: ok=True, team=primary-workspace, user=alice
 # → conversations.open: ok=True, channel=D0123456789
 # → chat.postMessage: ok=True
 
-$ python3 tool_connections/shared_utils/playwright_sso.py --slack-only --account sideproject
+$ python3 shared_utils/playwright_sso.py --slack-only --account sideproject
 # → slack:sideproject: ok
 # → auth.test: ok=True, team=sideproject-workspace, user=alice
 # → conversations.open: ok=True, channel=D9876543210

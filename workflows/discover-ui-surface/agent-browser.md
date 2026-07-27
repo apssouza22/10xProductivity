@@ -10,7 +10,7 @@ It complements the 10x connection workflow:
 - Use a supported official API when one provides the required capability.
 - When no suitable API exists, use Agent Browser as the default browser-backed
   operating path.
-- Use `tool_connections/shared_utils/traffic_sniffer.py` when you need durable
+- Use `shared_utils/traffic_sniffer.py` when you need durable
   reusable API endpoints, headers, and payload shapes.
 - Use custom Playwright/CDP scripts only when repeated structured automation,
   monitoring, or batching materially benefits from dedicated code.
@@ -187,7 +187,7 @@ Agent Browser is enough when the task is "what is visible on this page?" or
 "click through this flow." Continue using it for recurring interactive work
 when the site's UI or personalization is the required source of truth.
 
-Escalate to `tool_connections/shared_utils/traffic_sniffer.py` when you need to
+Escalate to `shared_utils/traffic_sniffer.py` when you need to
 write a connection file with verified API snippets:
 
 - Which endpoint returns the account list?

@@ -96,7 +96,7 @@ For each tool the user selected, follow this routing in order — stop at the fi
 
 **Validation is mandatory on all paths.** Run the verify snippet and confirm it returns expected output before marking a tool as done.
 
-**SSO tools need bootstrapping first.** For tools that use browser session auth (Slack, Grafana, Google Drive, etc.), credentials are not manually filled in — they are written to `TENX_PRIVATE_DIR/.env` by `playwright_sso.py`. The verify snippet will fail with a missing key error until you run the SSO script at least once. Check the tool's `setup.md` for the exact command (usually `source .venv/bin/activate && python3 tool_connections/shared_utils/playwright_sso.py --tool-only`).
+**SSO tools need bootstrapping first.** For tools that use browser session auth (Slack, Grafana, Google Drive, etc.), credentials are not manually filled in — they are written to `TENX_PRIVATE_DIR/.env` by `playwright_sso.py`. The verify snippet will fail with a missing key error until you run the SSO script at least once. Check the tool's `setup.md` for the exact command (usually `source .venv/bin/activate && python3 shared_utils/playwright_sso.py --tool-only`).
 
 ---
 

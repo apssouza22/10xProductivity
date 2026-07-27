@@ -24,7 +24,7 @@ That is the only input needed. Set `GRAFANA_BASE_URL` in `.env`, then run the SS
 
 ```bash
 source .venv/bin/activate
-python3 tool_connections/shared_utils/playwright_sso.py --grafana-only
+python3 shared_utils/playwright_sso.py --grafana-only
 ```
 
 On managed machines with enterprise SSO it completes automatically (~20–30s). On personal machines, complete the Grafana login once through the browser. `GRAFANA_SESSION` is written to `.env` automatically.
@@ -51,7 +51,7 @@ curl -s "$GRAFANA_BASE_URL/api/user" \
 
 ```bash
 # --- Grafana ---
-# Short-lived (~8h) — refresh with: python3 tool_connections/shared_utils/playwright_sso.py --grafana-only
+# Short-lived (~8h) — refresh with: python3 shared_utils/playwright_sso.py --grafana-only
 GRAFANA_BASE_URL=https://grafana.yourcompany.com
 GRAFANA_SESSION=your-grafana-session-cookie-value
 ```
@@ -62,7 +62,7 @@ GRAFANA_SESSION=your-grafana-session-cookie-value
 
 ```bash
 source .venv/bin/activate
-python3 tool_connections/shared_utils/playwright_sso.py --grafana-only
+python3 shared_utils/playwright_sso.py --grafana-only
 ```
 
 Token TTL: ~8h.

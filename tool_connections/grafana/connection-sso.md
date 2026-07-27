@@ -41,7 +41,7 @@ curl -s "$GRAFANA_BASE_URL/api/user" \
 ```bash
 # Refreshes GRAFANA_SESSION — opens browser for SSO, ~20–30 s
 source .venv/bin/activate
-python3 tool_connections/shared_utils/playwright_sso.py
+python3 shared_utils/playwright_sso.py
 ```
 
 ---
