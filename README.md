@@ -4,7 +4,7 @@
 
 Use the coding agents, browser sessions, desktop apps, notifications, and tool access you already have. No new company-wide automation platform, no admin-approved Slack app, no webhooks, and no IT project required.
 
-[![GitHub Stars](https://img.shields.io/github/stars/ZhixiangLuo/10xProductivity?style=social)](https://github.com/ZhixiangLuo/10xProductivity/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/ZhixiangLuo/incident-investigator-agent?style=social)](https://github.com/ZhixiangLuo/incident-investigator-agent/stargazers)
 
 If this saves you time, consider giving it a star. It helps others discover the project.
 
@@ -14,9 +14,9 @@ If this saves you time, consider giving it a star. It helps others discover the 
 
 <a href="https://www.star-history.com/?repos=ZhixiangLuo%2F10xProductivity&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ZhixiangLuo/10xProductivity&type=date&theme=dark&legend=top-left&sealed_token=QfW1emsXrddzjk2Yk4Oq2wVOHeQCCxXeGnIQpTkCYF3NNXVoQUmQzruCIgo6bi1vdVBHsmF8x-0_OPo3QHotCGURIy_ErDTb5Q2aRLJHM6iHzxMJiGwUkmkqxSKGSYPiyUaUWfDthv8UanPpIB8UCxBftdlFBH_ceUZEVG0KDpFXuWF1Qb0DPYhNkUp4" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ZhixiangLuo/10xProductivity&type=date&legend=top-left&sealed_token=QfW1emsXrddzjk2Yk4Oq2wVOHeQCCxXeGnIQpTkCYF3NNXVoQUmQzruCIgo6bi1vdVBHsmF8x-0_OPo3QHotCGURIy_ErDTb5Q2aRLJHM6iHzxMJiGwUkmkqxSKGSYPiyUaUWfDthv8UanPpIB8UCxBftdlFBH_ceUZEVG0KDpFXuWF1Qb0DPYhNkUp4" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ZhixiangLuo/10xProductivity&type=date&legend=top-left&sealed_token=QfW1emsXrddzjk2Yk4Oq2wVOHeQCCxXeGnIQpTkCYF3NNXVoQUmQzruCIgo6bi1vdVBHsmF8x-0_OPo3QHotCGURIy_ErDTb5Q2aRLJHM6iHzxMJiGwUkmkqxSKGSYPiyUaUWfDthv8UanPpIB8UCxBftdlFBH_ceUZEVG0KDpFXuWF1Qb0DPYhNkUp4" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ZhixiangLuo/incident-investigator-agent&type=date&theme=dark&legend=top-left&sealed_token=QfW1emsXrddzjk2Yk4Oq2wVOHeQCCxXeGnIQpTkCYF3NNXVoQUmQzruCIgo6bi1vdVBHsmF8x-0_OPo3QHotCGURIy_ErDTb5Q2aRLJHM6iHzxMJiGwUkmkqxSKGSYPiyUaUWfDthv8UanPpIB8UCxBftdlFBH_ceUZEVG0KDpFXuWF1Qb0DPYhNkUp4" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ZhixiangLuo/incident-investigator-agent&type=date&legend=top-left&sealed_token=QfW1emsXrddzjk2Yk4Oq2wVOHeQCCxXeGnIQpTkCYF3NNXVoQUmQzruCIgo6bi1vdVBHsmF8x-0_OPo3QHotCGURIy_ErDTb5Q2aRLJHM6iHzxMJiGwUkmkqxSKGSYPiyUaUWfDthv8UanPpIB8UCxBftdlFBH_ceUZEVG0KDpFXuWF1Qb0DPYhNkUp4" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ZhixiangLuo/incident-investigator-agent&type=date&legend=top-left&sealed_token=QfW1emsXrddzjk2Yk4Oq2wVOHeQCCxXeGnIQpTkCYF3NNXVoQUmQzruCIgo6bi1vdVBHsmF8x-0_OPo3QHotCGURIy_ErDTb5Q2aRLJHM6iHzxMJiGwUkmkqxSKGSYPiyUaUWfDthv8UanPpIB8UCxBftdlFBH_ceUZEVG0KDpFXuWF1Qb0DPYhNkUp4" />
  </picture>
 </a>
 
@@ -161,7 +161,7 @@ setup-python.md          Python and Playwright setup helper
 Private runtime state lives outside the public repo by default:
 
 ```text
-~/.10xProductivity/
+~/.incident-investigator-agent/
   .env                    Tokens, cookies, and private config
   personal/               Your active private tool recipes and patched copies
   verified_connections.md Device-specific connection index
@@ -170,7 +170,7 @@ Private runtime state lives outside the public repo by default:
 
 Set `TENX_PRIVATE_DIR` if you want a different private directory. The repo keeps hooks and `.gitignore` as safety nets, but credentials and browser/session state should not live under the repo tree.
 
-Migration note: older local instructions may point at `/path/to/10xProductivity/.env`, `/path/to/10xProductivity/personal/`, or `/path/to/10xProductivity/verified_connections.md`. Those now map to `TENX_PRIVATE_DIR/.env`, `TENX_PRIVATE_DIR/personal/`, and `TENX_PRIVATE_DIR/verified_connections.md`. The repo `personal/` folder is only a placeholder with this reminder.
+Migration note: older local instructions may point at `/path/to/incident-investigator-agent/.env`, `/path/to/incident-investigator-agent/personal/`, or `/path/to/incident-investigator-agent/verified_connections.md`. Those now map to `TENX_PRIVATE_DIR/.env`, `TENX_PRIVATE_DIR/personal/`, and `TENX_PRIVATE_DIR/verified_connections.md`. The repo `personal/` folder is only a placeholder with this reminder.
 
 The current repo is strongest at the connection layer. The trigger, runtime, and workflow layers now exist, but are still early. The next product direction is to harden enterprise-friendly triggers, promote more workflows, and make runtime execution reliable without requiring enterprise app installs or new infrastructure.
 
@@ -203,7 +203,7 @@ Packaged skills currently cover [tool setup](.cursor/skills/tool-connector/SKILL
 2. Clone and open this repo:
 
 ```bash
-git clone https://github.com/ZhixiangLuo/10xProductivity.git
+git clone https://github.com/ZhixiangLuo/incident-investigator-agent.git
 cd 10xProductivity
 ```
 

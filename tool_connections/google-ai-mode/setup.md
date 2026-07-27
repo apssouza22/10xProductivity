@@ -19,7 +19,7 @@ Session lifetime: Google session cookies in the Chrome profile typically last we
 1. Open the dedicated Chrome profile:
 
 ```bash
-cd /path/to/10xProductivity
+cd /path/to/incident-investigator-agent
 .venv/bin/python3 tool_connections/google-ai-mode/sso.py
 ```
 

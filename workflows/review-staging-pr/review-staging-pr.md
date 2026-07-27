@@ -14,8 +14,8 @@ description: Review a staging contribution PR, merge it (so the contributor gets
 Fetch the PR diff and check every item below. All must pass before proceeding.
 
 ```bash
-gh pr view <PR_NUMBER> --repo ZhixiangLuo/10xProductivity --json title,body,files
-gh api repos/ZhixiangLuo/10xProductivity/pulls/<PR_NUMBER>/files \
+gh pr view <PR_NUMBER> --repo ZhixiangLuo/incident-investigator-agent --json title,body,files
+gh api repos/ZhixiangLuo/incident-investigator-agent/pulls/<PR_NUMBER>/files \
   | python3 -c "import sys,json; [print(f['filename'],'\n',f.get('patch','')[:4000]) for f in json.load(sys.stdin)]"
 ```
 
@@ -38,7 +38,7 @@ If any item fails, comment on the PR with what needs to be fixed and stop.
 ## Step 2: Merge (gives contributor GitHub credit)
 
 ```bash
-gh pr merge <PR_NUMBER> --repo ZhixiangLuo/10xProductivity --squash --admin
+gh pr merge <PR_NUMBER> --repo ZhixiangLuo/incident-investigator-agent --squash --admin
 git checkout main && git pull origin main
 ```
 
@@ -82,7 +82,7 @@ git rev-parse --short HEAD
 Leave a comment on the PR:
 
 ```bash
-gh pr comment <PR_NUMBER> --repo ZhixiangLuo/10xProductivity \
+gh pr comment <PR_NUMBER> --repo ZhixiangLuo/incident-investigator-agent \
   --body "Thanks for the contribution! Promoted to \`tool_connections/{tool-name}/\` in commit \`abc1234\`. 🎉"
 ```
 

@@ -56,7 +56,7 @@ Verified scrubbed output:
 ```text
 $ python3 tool_connections/shared_utils/playwright_sso.py --outlook-only --force
 SSO token refresher
-  .env: /path/to/10xProductivity/.env
+  .env: /path/to/incident-investigator-agent/.env
 
   Refreshing outlook...
   Opening Outlook (https://outlook.office.com/mail/) with login hint alice@example.com — Azure AD SSO should auto-complete...
@@ -65,7 +65,7 @@ SSO token refresher
     Login detected!
     Graph token captured (3215 chars)
     OWA token captured (5098 chars)
-  Updated /path/to/10xProductivity/.env
+  Updated /path/to/incident-investigator-agent/.env
     Updated GRAPH_ACCESS_TOKEN
     Updated OWA_ACCESS_TOKEN
 

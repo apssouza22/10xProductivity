@@ -4,22 +4,7 @@ Connect any tool you use at work — internal company tools, custom-built system
 
 ## Getting started
 
-Check if the repo is present:
-
-```bash
-ls setup.md 2>/dev/null && echo "repo present" || echo "need to clone"
-```
-
-**Repo present** → read `setup.md` — it is the full entry point for $ARGUMENTS.
-
-**Need to clone** →
-
-```bash
-git clone https://github.com/zhixiangluo/10xProductivity.git
-cd 10xProductivity
-```
-
-Then read `setup.md`.
+read `setup.md` — it is the full entry point for $ARGUMENTS.
 
 ## Routing
 
@@ -32,6 +17,6 @@ Then read `setup.md`.
 
 ## Pre-built recipes available
 
-Slack, Confluence, Jira, Linear, GitHub, Microsoft Teams, Outlook, Google Drive, Datadog, Grafana, PagerDuty, Jenkins, Backstage, Bitbucket Server, Artifactory.
+Slack, Confluence, Jira, GitHub, Grafana and Kibana.
 
 Internal and custom tools follow the same path — stay private in `personal/` (gitignored, never committed).

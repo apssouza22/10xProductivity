@@ -11,7 +11,7 @@ def repo_root() -> Path:
 
 
 def private_dir() -> Path:
-    return Path(os.environ.get("TENX_PRIVATE_DIR", "~/.10xProductivity")).expanduser()
+    return Path(os.environ.get("TENX_PRIVATE_DIR", "~/.incident-investigator-agent")).expanduser()
 
 
 def tmp_dir() -> Path:

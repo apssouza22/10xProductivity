@@ -187,47 +187,6 @@ curl -s -u "$CONFLUENCE_EMAIL:$CONFLUENCE_TOKEN" \
 
 ---
 
-### Linear
-
-GraphQL keyword search across all issues.
-
-```bash
-source .env
-curl -s -X POST "$LINEAR_BASE_URL" \
-  -H "Authorization: $LINEAR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "{ searchIssues(term: \"<KEYWORD>\", first: 5) { nodes { identifier title state { name } assignee { name } url } } }"}' \
-  | jq '.data.searchIssues.nodes[] | {identifier, title, state: .state.name, assignee: .assignee.name, url}'
-```
-
-Use `term` not `query` — the older `issueSearch(query: ...)` is deprecated.
-
----
-
-### Notion
-
-Title-based search across pages shared with your integration.
-
-```bash
-source .env
-curl -s -X POST "$NOTION_BASE_URL/search" \
-  -H "Authorization: Bearer $NOTION_API_TOKEN" \
-  -H "Notion-Version: 2026-03-11" \
-  -H "Content-Type: application/json" \
-  --data '{"query": "<KEYWORD>", "filter": {"value": "page", "property": "object"}, "page_size": 5}' \
-  | jq '.results[] | {title: .properties.title.title[0].plain_text, id, url}'
-
-# To read the content of a result page:
-curl -s "$NOTION_BASE_URL/blocks/<PAGE_ID>/children" \
-  -H "Authorization: Bearer $NOTION_API_TOKEN" \
-  -H "Notion-Version: 2026-03-11" \
-  | jq '.results[] | select(.type == "paragraph") | .paragraph.rich_text[].plain_text'
-```
-
-**Notion limitation:** searches page titles only, not body text. If results are empty, the integration may not have access to the relevant pages — see the Notes section in `staging/notion/connection-api-token.md`.
-
----
-
 ### Jira
 
 JQL full-text search across issues.
@@ -292,7 +251,7 @@ To scope to a specific repo: append `+repo:{owner}/{repo}` to the query.
 For anything outside the company's own systems — public documentation, news, market data, competitor or company facts — prefer Google AI Mode over raw web search + fetch. It reads across Google's index and returns one synthesized, sourced answer. Ask the question; let it fetch. Supports multi-turn `--followup`.
 
 ```bash
-cd /path/to/10xProductivity && .venv/bin/python3 tool_connections/google-ai-mode/google_ai_mode.py \
+cd /path/to/incident-investigator-agent && .venv/bin/python3 tool_connections/google-ai-mode/google_ai_mode.py \
   "<YOUR QUESTION>" \
   --followup "<OPTIONAL DRILL-IN>"
 ```

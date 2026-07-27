@@ -114,7 +114,7 @@ Pass it to `local.drive.read(doc_id, "document")` to export content as plain tex
 
 ## Bridge cache
 
-`smart_search()` caches online results to `TENX_PRIVATE_DIR/personal/tool_connections/google-drive/bridge_cache/` as `.gdrive.json` files. The default `TENX_PRIVATE_DIR` is `~/.10xProductivity`, keeping searched file IDs and other user-specific data outside this repo. Subsequent searches for the same query return instantly without hitting the network.
+`smart_search()` caches online results to `TENX_PRIVATE_DIR/personal/tool_connections/google-drive/bridge_cache/` as `.gdrive.json` files. The default `TENX_PRIVATE_DIR` is `~/.incident-investigator-agent`, keeping searched file IDs and other user-specific data outside this repo. Subsequent searches for the same query return instantly without hitting the network.
 
 ```json
 {

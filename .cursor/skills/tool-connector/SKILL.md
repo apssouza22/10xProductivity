@@ -1,7 +1,7 @@
 ---
 name: tool-connector
 description: Connect any tool you use at work to your agent — including internal company tools, custom-built systems, deployment portals, incident trackers, internal knowledge bases, HR systems, and commercial tools like Slack, Confluence, Jira, Linear, GitHub, Outlook, Datadog, and PagerDuty. Use when the user wants to set up a tool connection, connect an internal or custom-built tool, or add a new tool integration from scratch.
-source: https://github.com/zhixiangluo/10xProductivity
+source: https://github.com/zhixiangluo/incident-investigator-agent
 author: zhixiangluo
 ---
 
@@ -9,7 +9,7 @@ author: zhixiangluo
 
 > **Requires the repo cloned locally.** Check if it's already present (`ls setup.md`), then read `setup.md` — that is the full entry point. The sections below summarize the approach for reference.
 
-Full methodology and pre-built recipes: https://github.com/zhixiangluo/10xProductivity
+Full methodology and pre-built recipes: https://github.com/zhixiangluo/incident-investigator-agent
 
 ## Internal tools are first-class citizens
 
@@ -64,7 +64,7 @@ ls setup.md 2>/dev/null && echo "repo present" || echo "need to clone"
 **Need to clone** →
 
 ```bash
-git clone https://github.com/zhixiangluo/10xProductivity.git
+git clone https://github.com/zhixiangluo/incident-investigator-agent.git
 cd 10xProductivity
 ```
 

@@ -131,7 +131,7 @@ recipes.
 
 ```bash
 # Ensure Google session (opens Chrome only if needed)
-cd ~/git_repos/10xProductivity
+cd ~/git_repos/incident-investigator-agent
 .venv/bin/python3 tool_connections/<tool>/sso.py
 
 source "$HOME/.nvm/nvm.sh" && nvm use 24

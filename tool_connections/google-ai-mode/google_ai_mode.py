@@ -22,7 +22,7 @@ import sys
 
 # The shared browser helpers live in the `tool_connections` namespace package,
 # which only exists in the git_repos 10xProductivity checkout — not under
-# ~/.10xProductivity, where this script is deployed. Add every candidate root
+# ~/.incident-investigator-agent, where this script is deployed. Add every candidate root
 # that contains `tool_connections/shared_utils` to sys.path so the import
 # resolves regardless of which tree this file is run from.
 _CANDIDATE_ROOTS = [

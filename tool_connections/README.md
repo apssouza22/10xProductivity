@@ -91,7 +91,7 @@ The agent fans out across every connected tool, pulls relevant results, and retu
 
 **When to use it:** Any time you're asking a question that might be answered in more than one place — "what was the decision on X", "who owns Y", "is there a doc on Z", "any context on this incident", "what did we decide about this feature".
 
-To activate: `Read /path/to/10xProductivity/workflows/enterprise-search/enterprise-search.md`
+To activate: `Read /path/to/incident-investigator-agent/workflows/enterprise-search/enterprise-search.md`
 
 ---
 
@@ -130,7 +130,7 @@ setup-python.md      ← detect OS, try winget/brew/apt then python.org if neede
 1. **Install Cursor** (the editor your agent runs in): open **[cursor.com/download](https://cursor.com/download)**, download the installer for **Windows** or **macOS**, run it, and sign in or create an account when prompted.
 
 ```bash
-git clone https://github.com/ZhixiangLuo/10xProductivity.git
+git clone https://github.com/ZhixiangLuo/incident-investigator-agent.git
 cd 10xProductivity
 ```
 
@@ -141,7 +141,7 @@ If you do not have **Python 3** yet (common on a fresh laptop), point your agent
 Then point your agent at the setup guide:
 
 ```
-Read /path/to/10xProductivity/setup.md and set up my tool connections.
+Read /path/to/incident-investigator-agent/setup.md and set up my tool connections.
 ```
 
 Your agent handles the rest — it will ask which tools you use and the URLs, get the credentials it needs, run SSO where required, and verify each connection works. Works for any tool: pre-built recipes for common tools, and an identical setup path for internal or custom tools.
@@ -151,7 +151,7 @@ Your agent handles the rest — it will ask which tools you use and the URLs, ge
 ## Who uses this layer and how
 
 **User** — you want to connect your agent to tools you already use:
-1. Clone the repo and point your agent at it: *"Read /path/to/10xProductivity/setup.md and set up my tool connections"*
+1. Clone the repo and point your agent at it: *"Read /path/to/incident-investigator-agent/setup.md and set up my tool connections"*
 2. Your agent asks which tools you use, handles credentials, runs SSO where needed, and verifies each connection
 3. From that point your tools and the search workflow are available automatically at the start of every session — no MCP server, no plugin, no admin approval
 

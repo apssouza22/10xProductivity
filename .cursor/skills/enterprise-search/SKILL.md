@@ -9,7 +9,7 @@ description: >
   a topic, a person, a past discussion, or anything that might be documented
   across work tools. Also triggers on: "find", "search for", "who worked on",
   "what was the decision about", "is there a doc on", "any Slack about".
-source: https://github.com/zhixiangluo/10xProductivity
+source: https://github.com/zhixiangluo/incident-investigator-agent
 ---
 
 # Enterprise Search
