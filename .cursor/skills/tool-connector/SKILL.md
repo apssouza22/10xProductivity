@@ -9,7 +9,7 @@ author: zhixiangluo
 
 > **Requires the repo cloned locally.** Check if it's already present (`ls setup.md`), then read `setup.md` — that is the full entry point. The sections below summarize the approach for reference.
 
-Full methodology and pre-built recipes: https://github.com/zhixiangluo/incident-investigator-agent
+Full methodology and pre-built recipes: https://github.com/apssouza22/incident-investigator-agent
 
 ## Internal tools are first-class citizens
 

@@ -25,8 +25,6 @@ One query → Slack + Confluence (always when connected) + any AI-synthesized se
 | Slack | Decisions, incident threads, "why did we do X" |
 | Confluence | Runbooks, architecture docs, procedures |
 | Jira | Tickets, bugs, epics, sprint history |
-| Linear | Project issues and feature requests |
-| Notion | Pages and databases |
 | GitHub | Code, PRs, issues (code-related queries only) |
 | *Other* | If `verified_connections.md` lists an AI assistant or multi-source knowledge search, follow that connection file in parallel — see the workflow. |
 

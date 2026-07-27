@@ -194,7 +194,7 @@ Internal portals and custom company tools matter just as much as commercial SaaS
 
 Agent skills sit above raw tool connections. They teach your coding agent how to do work, not just how to call an API.
 
-Packaged skills currently cover [tool setup](.cursor/skills/tool-connector/SKILL.md), [enterprise search](.cursor/skills/enterprise-search/SKILL.md), [workflow creation](.cursor/skills/create-workflow/SKILL.md), [UI surface discovery](.cursor/skills/discover-ui-surface/SKILL.md), [colleague distillation](.cursor/skills/colleague-distillation/SKILL.md), and the [assistant inbox/runtime](.cursor/skills/assistant-orchestrator/SKILL.md).
+Packaged skills currently cover [tool setup](.cursor/skills/tool-connector/SKILL.md), [enterprise search](.cursor/skills/enterprise-search/SKILL.md), [workflow creation](.cursor/skills/create-workflow/SKILL.md), [colleague distillation](.cursor/skills/colleague-distillation/SKILL.md), and the [assistant inbox/runtime](.cursor/skills/assistant-orchestrator/SKILL.md).
 
 ## Quick Start
 

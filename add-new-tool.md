@@ -42,7 +42,7 @@ Dedicated automation accounts (separate from day-to-day personal use) are accept
 ## Non-negotiable rules
 
 1. **`TENX_PRIVATE_DIR/personal/` first, always.** All work — new tools, improvements to existing connections, new auth variants, fixes — starts in `TENX_PRIVATE_DIR/personal/`. Never edit `tool_connections/` directly. `TENX_PRIVATE_DIR/personal/` lives outside the public repo and is safe for your email, org URLs, tokens, and company-specific details. Nothing leaves `TENX_PRIVATE_DIR/personal/` until it is verified, scrubbed, and promoted via `staging/` → PR. This applies to improvements just as much as new tools.
-2. **Research viability first.** Before asking the user for anything, determine what auth methods exist for this tool. Prefer a supported API. If no suitable API exists, treat Agent Browser over an authenticated browser session as the default operational fallback; do not jump straight to a custom Playwright/CDP script.
+2. **Research viability first.** Before asking the user for anything, determine what auth methods exist for this tool. Prefer a supported API. If no suitable API exists, use browser session auth (`sso.py` + `session_request.py`) and `traffic_sniffer.py` to discover replayable endpoints before writing custom Playwright/CDP scripts.
 3. **Ask only what the auth method actually needs.** The credential ask must be proportional to the auth method: browser session → ask for nothing (just a URL to confirm the instance); API token → ask for the token and where to generate it; username+password → ask for both. Never ask vague questions the user can't answer.
 4. **A URL is your best minimal input.** If you need to confirm an instance, ask for any URL from that tool (profile page, dashboard, ticket). It reveals the base URL, regional variant, and proves the user has access — without requiring them to know anything about auth.
 5. **Run before you write.** Every snippet must be code you actually executed and saw succeed against a live instance. No copy-paste from docs. No illustrative output. The reason you haven't run them does not matter — unverified snippets do not belong in a connection file.
@@ -88,9 +88,8 @@ Before asking the user for anything:
 | -------- | ------------------------------------------------ | ------------------------------------------------ | ---------------------------------- |
 | 1        | **Browser session (persistent profile)**         | Low — sign in once in the browser, session persists | A URL from the tool             |
 | 2        | **Supported API token / preconfigured OAuth**    | Near-zero — token or authorize click             | Only what the supported flow needs |
-| 3        | **Agent Browser + one-time browser login**       | Low — user signs in once, session persists       | A URL from the tool                |
-| 4        | **Custom CDP/Playwright automation**             | Higher maintenance — tool-specific code          | A URL from the tool                |
-| 5        | **Username + password**                          | Low — but only for legacy tools                  | Username and password              |
+| 3        | **Custom CDP/Playwright automation**             | Higher maintenance — tool-specific code          | A URL from the tool                |
+| 4        | **Username + password**                          | Low — but only for legacy tools                  | Username and password              |
 | ✗        | **OAuth requiring user to create their own app** | High — stop, do not use                          | N/A                                |
 
 
@@ -99,21 +98,18 @@ Before asking the user for anything:
 **Browser session API calls:** when a tool uses browser session auth (`auth: sso-session` or `auth: session-cookie`), all HTTP calls must go through `shared_utils/session_request.py` — not raw `urllib`, `curl`, or `requests`. Auth tokens and cookies stay in the shared browser profile at `~/.browser_automation/profile/` — never in `.env`. Only non-secret config (instance URLs) belongs in `.env`. Add a `sniffer:` block to the connection frontmatter (profile + warmup URL) so `tool_request("tool-name", ...)` can reuse the saved profile.
 
 
-**Browser fallback rule:** when no suitable API is available, use Agent Browser
-as the default browser interface. It provides compact accessibility snapshots,
-semantic interaction, existing-session reuse, and action-time confirmation
-without requiring a connector-specific script.
+**Browser fallback rule:** when no suitable API is available, use the shared persistent profile (`sso.py` + `session_request.py`) for browser-backed reads. Use `traffic_sniffer.py` to discover replayable API endpoints before driving the DOM.
 
-Escalate from Agent Browser to custom CDP/Playwright only when at least one is
+Escalate from browser session to custom CDP/Playwright only when at least one is
 true:
 
 - a stable structured read runs repeatedly and a script materially reduces cost;
 - deterministic batch processing, monitoring, or scheduling is required;
-- Agent Browser cannot expose the needed UI surface reliably;
+- the UI surface cannot be reached reliably through session-backed HTTP calls;
 - traffic capture is needed to discover a replayable API.
 
 Do not create custom browser code merely to open, inspect, click, draft, or
-submit through a normal authenticated UI.
+submit through a normal authenticated UI when `session_request.py` or a captured API call can do the job.
 
 **On OAuth:** OAuth is acceptable *only* when the repo ships pre-configured client credentials (the user just clicks "Authorize" in their browser — zero app creation). OAuth that requires the user to create a Google Cloud project, register a redirect URI, or configure a consent screen is **not acceptable** — the friction cost makes it worse than a browser session.
 
@@ -125,16 +121,10 @@ submit through a normal authenticated UI.
 2. Document the refresh command in the connection file: `python3 "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal/{tool-name}/sso.py"` — the agent cannot self-refresh without the user present.
 3. Document the token TTL (usually ~8h) — so the user knows when to expect re-authentication prompts.
 
-**Use Agent Browser for browser-backed operation as well as reconnaissance.**
-Read `workflows/discover-ui-surface/agent-browser.md` when you need the agent to
-open a page, inspect visible UI, use a personalized feed, click through a flow,
-draft content, or perform an approved action. Keep recipes generic:
-machine-specific CDP ports are runtime-only and must not be written into them.
-
 **Prefer replayable APIs when they exist; keep browser operation when the UI is
 the product surface.** Personalized feeds, recommendations, chat, and UI-only
 workflows may remain browser-backed by design. Document the limitation and the
-reason. Do not reverse-engineer private endpoints solely to avoid Agent Browser.
+reason. Do not reverse-engineer private endpoints solely to avoid browser session work when the UI is the required surface.
 
 **Use `shared_utils/traffic_sniffer.py`** — a ready-to-run generic sniffer. It attaches a context-level listener before any page loads (catches service workers and background frames that `page.on` misses), opens the persistent profile, and records all matching traffic to a JSONL file while the user performs actions manually. Response bodies are **off by default** (LinkedIn and other heavy SPAs: reading large bodies in the sync handler can stall the driver and drop most later traffic); pass `--capture-bodies` only when you need response payloads.
 
@@ -206,9 +196,7 @@ Sites redirect. Confirm the real base URL before researching. Note any site-vari
 1. Official docs (`docs.tool.com/api` or `developer.tool.com`)
 2. OpenAPI/Swagger spec (`/api/swagger.json`, `/openapi.json`)
 3. GitHub code search — working callers are more accurate than docs
-4. **Agent Browser operation/reconnaissance** — when the UI is the required
-   surface: read `workflows/discover-ui-surface/agent-browser.md`, inspect compact snapshots, and use semantic interactions.
-5. **Browser traffic capture** — when docs are missing or incomplete and you need replayable endpoints: run `shared_utils/traffic_sniffer.py` (see above), ask the user to perform the target action, and read the JSONL output. The URL, headers, and body are everything you need to replay the call directly.
+4. **Browser traffic capture** — when docs are missing or incomplete and you need replayable endpoints: run `shared_utils/traffic_sniffer.py` (see above), ask the user to perform the target action, and read the JSONL output. The URL, headers, and body are everything you need to replay the call directly.
 
 **Collect before moving on:**
 
@@ -247,7 +235,7 @@ TOOL_BASE_URL=https://api.tool.com
 Choose the validation track selected in Step 0:
 
 - **API track:** validate auth plus at least two real read endpoints.
-- **Agent Browser track:** validate at least two real read surfaces and one
+- **Browser session track:** validate at least two real read surfaces and one
   interaction flow up to—but not through—its final write action. For a write,
   execute only after explicit approval, then verify the result URL.
 
@@ -462,8 +450,8 @@ Then reload `TENX_PRIVATE_DIR/verified_connections.md` — the new tool is now l
 - Base URL confirmed (not guessed)
 - Auth mechanism identified and tested on production
 - API track: at least 2 read endpoints run, real output recorded
-- Agent Browser track: at least 2 read surfaces verified with compact output
-- Agent Browser track: one interaction flow verified; writes require approval
+- Browser session track: at least 2 read surfaces verified with compact output
+- Browser session track: one interaction flow verified; writes require approval
 - API track: at least one failure case documented (4xx, deprecated endpoint, or
   permission error)
 - Search capability tested through the selected track, or explicitly noted as

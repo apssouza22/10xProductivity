@@ -1,6 +1,6 @@
 # Tool Connector — Connect Any Work Tool to Your Agent
 
-Connect any tool you use at work — internal company tools, custom-built systems, and commercial tools like Slack, Confluence, Jira, Linear, GitHub, Outlook, Datadog, and PagerDuty.
+Connect any tool you use at work — internal company tools, custom-built systems, and commercial tools like Slack, Confluence, Jira, GitHub, Grafana and Kibana.
 
 ## Getting started
 
