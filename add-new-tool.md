@@ -86,12 +86,15 @@ Before asking the user for anything:
 
 | Priority | Auth method                                      | User friction                                    | Ask the user for                   |
 | -------- | ------------------------------------------------ | ------------------------------------------------ | ---------------------------------- |
-| 1        | **Supported API token / preconfigured OAuth**    | Near-zero — token or authorize click             | Only what the supported flow needs |
-| 2        | **Agent Browser + existing browser session**     | Near-zero — reuse authenticated browser state    | Usually nothing                    |
-| 3        | **Agent Browser + one-time browser login**       | Low — user signs in once, session persists       | A URL from the tool                |
+| 1        | **Browser session (persistent profile)**         | Near-zero — reuse authenticated browser state    | Usually nothing (a URL if first setup) |
+| 2        | **Agent Browser + one-time browser login**       | Low — user signs in once, session persists       | A URL from the tool                |
+| 3        | **Supported API token / preconfigured OAuth**    | Near-zero — token or authorize click             | Only what the supported flow needs |
 | 4        | **Custom CDP/Playwright automation**             | Higher maintenance — tool-specific code          | A URL from the tool                |
 | 5        | **Username + password**                          | Low — but only for legacy tools                  | Username and password              |
 | ✗        | **OAuth requiring user to create their own app** | High — stop, do not use                          | N/A                                |
+
+
+**Browser session API calls:** when a tool uses browser session auth (`auth: sso-session` or `auth: session-cookie`), all HTTP calls must go through `shared_utils/session_request.py` — not raw `urllib`, `curl`, or `requests`. Add a `sniffer:` block to the connection frontmatter (profile + warmup URL) so `tool_request("tool-name", ...)` can reuse the saved profile. See `tool_connections/slack/connection-sso.md` for a working example.
 
 
 **Browser fallback rule:** when no suitable API is available, use Agent Browser
@@ -114,7 +117,7 @@ submit through a normal authenticated UI.
 
 **Stop and explain** if the only viable path requires the user to create an app or register OAuth credentials. Don't propose it as an option — it violates this repo's zero-friction goal.
 
-**SSO-only tools:** If the tool uses enterprise SSO and has no API token path, the only option is browser session capture (Priority 2). This is fine — but do three things:
+**SSO-only tools:** If the tool uses enterprise SSO and has no API token path, the only option is browser session capture (Priority 1). This is fine — but do three things:
 
 1. Write a plugin-compliant `sso.py` in `TENX_PRIVATE_DIR/personal/{tool-name}/` (not `tool_connections/`) with `TOOL_NAME`, `check(env) -> bool`, and `capture(env) -> dict`. Run it directly: `python3 "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal/{tool-name}/sso.py"`. If you later contribute the recipe upstream (owner-add or contribute workflow), `sso.py` is copied to `tool_connections/` as part of that process — not before.
 2. Document the refresh command in the connection file: `python3 "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal/{tool-name}/sso.py"` — the agent cannot self-refresh without the user present.

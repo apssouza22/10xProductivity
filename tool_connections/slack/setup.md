@@ -50,15 +50,11 @@ default `SLACK_XOXC` / `SLACK_D_COOKIE` pair.
 ## Verify
 
 ```python
-from pathlib import Path
-env = {k.strip(): v.strip() for line in Path(".env").read_text().splitlines()
-       if "=" in line and not line.startswith("#") for k, v in [line.split("=", 1)]}
-import urllib.request, json, ssl
-ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
-req = urllib.request.Request("https://slack.com/api/auth.test",
-    headers={"Authorization": f"Bearer {env['SLACK_XOXC']}", "Cookie": f"d={env['SLACK_D_COOKIE']}"})
-r = json.loads(urllib.request.urlopen(req, context=ctx, timeout=10).read())
-print(r.get("user"), r.get("team"))
+from shared_utils.session_request import tool_request
+
+result = tool_request("slack", "GET", "https://slack.com/api/auth.test")
+data = result.get("json") or {}
+print(data.get("user"), data.get("team"))
 # → alice  your-workspace
 # If ok=False: session expired — run playwright_sso.py --slack-only to refresh
 ```

@@ -31,6 +31,8 @@ Read `verified_connections.md`. Note which tools are available. Only search tool
 
 ## Step 2: Search
 
+**Auth routing:** For tools with `auth: sso-session` or `auth: session-cookie` in their connection file, use `shared_utils/session_request.py` (`tool_request("tool-name", method, url)`) — not `urllib`, `curl`, or env-token headers. API-token tools (Jira, Confluence, GitHub) keep their existing token-based snippets.
+
 **Start with Slackbot / Slack AI by default** (when Slack is connected). It is the first search for most enterprise knowledge questions because it can synthesize the current conversational record across Slack and often surfaces the practical answer fastest, especially for time-sensitive employee/process questions.
 
 **Also run Confluence in the same batch when it can validate or explain the answer.** Slack is the default source for current state and informal institutional knowledge; Confluence is the deliberate documentation source. For policy, process, HR, compliance, runbook, or "what is the official rule?" questions, use Confluence to confirm the Slack answer when available.
@@ -63,24 +65,16 @@ Best for natural-language questions. Posts to your Slackbot DM and synthesizes a
 **Key gotcha:** Slack AI puts its answer in `blocks` (rich text), not the `text` field. Use `extract_ai_answer()` below — reading `.get("text", "")` will return "_Thinking..._" instead of the real answer.
 
 ```python
-from pathlib import Path
-import json, ssl, time, urllib.request, urllib.parse
-
-env = {k.strip(): v.strip() for line in Path(".env").read_text().splitlines()
-       if "=" in line and not line.startswith("#") for k, v in [line.split("=", 1)]}
-xoxc, d = env["SLACK_XOXC"], env["SLACK_D_COOKIE"]
-ssl_ctx = ssl.create_default_context()
-ssl_ctx.check_hostname = False; ssl_ctx.verify_mode = ssl.CERT_NONE
+import json, time
+from urllib.parse import urlencode
+from shared_utils.session_request import tool_request
 
 def slack_api(method, endpoint, data=None, params=None):
     url = f"https://slack.com/api/{endpoint}"
-    if params: url += "?" + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url,
-        data=json.dumps(data).encode() if data else None,
-        headers={"Authorization": f"Bearer {xoxc}", "Cookie": f"d={d}",
-                 "Content-Type": "application/json; charset=utf-8"}, method=method)
-    with urllib.request.urlopen(req, context=ssl_ctx, timeout=15) as resp:
-        return json.loads(resp.read())
+    if params:
+        url += "?" + urlencode(params)
+    result = tool_request("slack", method, url, body=data)
+    return result.get("json") or json.loads(result.get("body") or "{}")
 
 def extract_element(item):
     t = item.get("type", "")
@@ -246,19 +240,6 @@ To scope to a specific repo: append `+repo:{owner}/{repo}` to the query.
 
 ---
 
-### Google AI Mode *(external / open-web questions)*
-
-For anything outside the company's own systems — public documentation, news, market data, competitor or company facts — prefer Google AI Mode over raw web search + fetch. It reads across Google's index and returns one synthesized, sourced answer. Ask the question; let it fetch. Supports multi-turn `--followup`.
-
-```bash
-cd /path/to/incident-investigator-agent && .venv/bin/python3 tool_connections/google-ai-mode/google_ai_mode.py \
-  "<YOUR QUESTION>" \
-  --followup "<OPTIONAL DRILL-IN>"
-```
-
-See `TENX_PRIVATE_DIR/personal/google-ai-mode/connection-cdp.md` for your active private copy, or `tool_connections/google-ai-mode/connection-cdp.md` for the public recipe. Use raw `WebFetch` only to verify an exact figure or confirm a primary source.
-
----
 
 ## Step 3: Synthesize and present results
 
@@ -279,4 +260,4 @@ After all searches complete, give the user **one direct answer** — not a tool-
 - **Notion searches titles only.** Body text is not indexed by the API. A "no results" from Notion doesn't mean the knowledge isn't there — it may just not be in the page title.
 - **GitHub is expensive for non-code queries.** Skip it unless the query is clearly code-related; it adds noise and burns API rate limits.
 - **Confluence vs. Jira overlap:** Confluence has the narrative ("how it works"), Jira has the status ("is it done"). Both are worth searching for most topics.
-- **Credentials:** always load from `.env` in Python, not `bash source .env` — long tokens (especially `SLACK_XOXC`) are silently truncated by bash.
+- **Credentials:** API-token tools load from `.env` in Python. Browser-session tools (Slack, Grafana, LinkedIn) use `shared_utils/session_request.py` with the persistent profile in `~/.browser_automation/` — do not read `SLACK_XOXC` or session cookies from `.env` for API calls.

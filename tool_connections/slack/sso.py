@@ -13,11 +13,10 @@ Standalone usage:
 import json
 import os
 import re
-import ssl
 import sys
 import time
 import urllib.parse
-import urllib.request
+from pathlib import Path
 
 try:
     from playwright.sync_api import sync_playwright
@@ -31,25 +30,29 @@ ENV_KEYS = ["SLACK_XOXC", "SLACK_D_COOKIE"]
 ACCOUNT_ENV_KEYS = ["SLACK_WORKSPACE_URL"]
 
 
+def _profile_dir() -> Path:
+    sys.path.insert(0, str(Path(__file__).parents[2]))
+    from shared_utils.browser import BROWSER_AUTOMATION_DIR
+    return BROWSER_AUTOMATION_DIR / "slack_profile"
+
+
 def check(env: dict) -> bool:
-    """Return True if the selected Slack xoxc token is valid."""
-    xoxc = env.get("SLACK_XOXC", "")
-    d_cookie = env.get("SLACK_D_COOKIE", "")
-    if not xoxc or xoxc.startswith("xoxc-your-"):
+    """Return True if the selected Slack browser session is valid."""
+    workspace_url = _normalize_workspace_url(env.get("SLACK_WORKSPACE_URL", ""))
+    if not workspace_url or "yourcompany" in workspace_url:
         return False
     try:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        req = urllib.request.Request(
+        sys.path.insert(0, str(Path(__file__).parents[2]))
+        from shared_utils.session_request import tool_request
+
+        result = tool_request(
+            "slack",
+            "GET",
             "https://slack.com/api/auth.test",
-            headers={
-                "Authorization": f"Bearer {xoxc}",
-                "Cookie": f"d={d_cookie}",
-            },
+            warmup_url=workspace_url,
         )
-        with urllib.request.urlopen(req, context=ctx, timeout=8) as r:
-            return json.loads(r.read()).get("ok") is True
+        data = result.get("json") or {}
+        return result.get("ok") is True and data.get("ok") is True
     except Exception:
         return False
 
@@ -108,7 +111,7 @@ def _tokens_for_account(tokens: dict, account: str | None) -> dict:
 
 
 def capture(env: dict) -> dict:
-    """Open Slack workspace in headed browser, extract xoxc + d cookie."""
+    """Open Slack workspace in a persistent profile, extract xoxc + d cookie."""
     workspace_url = _normalize_workspace_url(env.get("SLACK_WORKSPACE_URL", ""))
     if not workspace_url or "yourcompany" in workspace_url:
         prefix = env.get("SSO_ACCOUNT_PREFIX", "")
@@ -118,17 +121,19 @@ def capture(env: dict) -> dict:
             f"Add {workspace_key}=https://yourcompany.slack.com/ and retry."
         )
 
+    profile = _profile_dir()
+    profile.mkdir(parents=True, exist_ok=True)
     print(f"  Opening Slack ({workspace_url}) — SSO should auto-complete...")
+    print(f"  Profile: {profile}")
+
     with sync_playwright() as p:
-        chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-        launch_kwargs = dict(
+        ctx = p.chromium.launch_persistent_context(
+            str(profile),
+            channel="chrome",
             headless=False,
+            ignore_https_errors=True,
             args=["--window-size=900,600", "--window-position=100,100"],
         )
-        if os.path.exists(chrome_path):
-            launch_kwargs["executable_path"] = chrome_path
-        browser = p.chromium.launch(**launch_kwargs)
-        ctx = browser.new_context(ignore_https_errors=True)
         page = ctx.new_page()
 
         page.goto(workspace_url, wait_until="commit", timeout=30_000)
@@ -191,7 +196,6 @@ def capture(env: dict) -> dict:
                     break
         except KeyboardInterrupt:
             ctx.close()
-            browser.close()
             raise RuntimeError("Aborted by user — Slack login did not complete.")
 
         if not xoxc:
@@ -207,7 +211,6 @@ def capture(env: dict) -> dict:
             raise RuntimeError("No 'd' cookie found after Slack SSO.")
 
         ctx.close()
-        browser.close()
 
     print(f"    Slack xoxc captured ({len(xoxc)} chars)")
     return {"SLACK_XOXC": xoxc, "SLACK_D_COOKIE": d_cookie}

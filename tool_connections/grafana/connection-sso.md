@@ -5,6 +5,10 @@ description: Grafana dashboards — extract PromQL queries from panels, look up 
 env_vars:
   - GRAFANA_BASE_URL
   - GRAFANA_SESSION
+sniffer:
+  profile: ~/.browser_automation/grafana_profile
+  url: ${GRAFANA_BASE_URL}
+  filter: /api/
 ---
 
 # Grafana
@@ -17,21 +21,27 @@ Env: `GRAFANA_BASE_URL`, `GRAFANA_SESSION`
 # GRAFANA_SESSION=your-grafana-session-cookie-value   (~8h, refresh with playwright_sso.py)
 ```
 
-Auth: session cookie captured via SSO — refresh with the shared script (see below).
+Auth: session cookie captured via SSO into a persistent browser profile (`~/.browser_automation/grafana_profile/`) — refresh with `python3 shared_utils/playwright_sso.py --grafana-only`.
+
+**API calls:** use `shared_utils/session_request.py` — it reuses the saved browser profile and attaches session cookies automatically.
 
 **The primary use case is extracting PromQL:** Grafana dashboard JSON contains all panel queries with Grafana variable placeholders (e.g. `${env}`). Substitute variables to get runnable PromQL, then execute via your Prometheus-compatible endpoint.
 
 ## Verify connection
 
-```bash
-export $(grep -v '^#' .env | grep 'GRAFANA_' | xargs)
-curl -s "$GRAFANA_BASE_URL/api/user" \
-  -H "Cookie: grafana_session=$GRAFANA_SESSION" \
-  | jq '{login, email, name}'
+```python
+from pathlib import Path
+import os
+from shared_utils.browser import load_env_file, DEFAULT_ENV_FILE
+from shared_utils.session_request import tool_request
+
+env = load_env_file(DEFAULT_ENV_FILE)
+base = env["GRAFANA_BASE_URL"].rstrip("/")
+result = tool_request("grafana", "GET", f"{base}/api/user")
+print(result.get("json"))
 # → {"login": "alice", "email": "alice@example.com", "name": "Alice Smith"}
-# ⚠ Fresh clone: GRAFANA_SESSION doesn't exist until playwright_sso.py has run once — go to Refresh session below first.
+# ⚠ Fresh clone: run playwright_sso.py --grafana-only first to create the profile.
 # If you see 401/redirect: session expired — run playwright_sso.py to refresh.
-# If you see connection refused: check GRAFANA_BASE_URL in .env.
 ```
 
 ---
@@ -48,22 +58,22 @@ python3 shared_utils/playwright_sso.py
 
 ## Get PromQL from a dashboard
 
-```bash
-export $(grep -v '^#' .env | grep 'GRAFANA_' | xargs)
+```python
+from shared_utils.browser import load_env_file, DEFAULT_ENV_FILE
+from shared_utils.session_request import tool_request
 
-# Get full dashboard JSON — includes all panels and their PromQL targets
-curl -s "$GRAFANA_BASE_URL/api/dashboards/uid/{uid}" \
-  -H "Cookie: grafana_session=$GRAFANA_SESSION" \
-  | jq '[.dashboard.panels[] | select(.targets != null)
-         | {title, exprs: [.targets[]? | select(.expr) | .expr]}
-         | select(.exprs | length > 0)]'
+env = load_env_file(DEFAULT_ENV_FILE)
+base = env["GRAFANA_BASE_URL"].rstrip("/")
+uid = "{uid}"
 
-# Shorter version — first 10 panels, truncated expressions
-curl -s "$GRAFANA_BASE_URL/api/dashboards/uid/{uid}" \
-  -H "Cookie: grafana_session=$GRAFANA_SESSION" \
-  | jq '[.dashboard.panels[] | select(.targets != null)
-         | {title, exprs: [.targets[]? | select(.expr) | .expr[:120]]}
-         | select(.exprs | length > 0)][:10]'
+result = tool_request("grafana", "GET", f"{base}/api/dashboards/uid/{uid}")
+dashboard = result["json"]
+panels = [
+    {"title": p.get("title"), "exprs": [t["expr"] for t in p.get("targets", []) if t.get("expr")]}
+    for p in dashboard.get("dashboard", {}).get("panels", [])
+    if p.get("targets")
+]
+print(panels[:10])
 ```
 
 **Variable substitution:** Panel PromQL uses Grafana template variables like `${env}` or `$service`. Replace with actual values before running:
@@ -89,38 +99,48 @@ runnable = substitute_vars(expr, vars)
 
 ## Find dashboards
 
-```bash
-export $(grep -v '^#' .env | grep 'GRAFANA_' | xargs)
+```python
+from shared_utils.browser import load_env_file, DEFAULT_ENV_FILE
+from shared_utils.session_request import tool_request
+
+env = load_env_file(DEFAULT_ENV_FILE)
+base = env["GRAFANA_BASE_URL"].rstrip("/")
 
 # Search by keyword
-curl -s "$GRAFANA_BASE_URL/api/search?query=<keyword>&limit=10&type=dash-db" \
-  -H "Cookie: grafana_session=$GRAFANA_SESSION" \
-  | jq '.[] | {title, uid, folderTitle}'
+result = tool_request("grafana", "GET", f"{base}/api/search?query=<keyword>&limit=10&type=dash-db")
+for item in result.get("json") or []:
+    print(item.get("title"), item.get("uid"), item.get("folderTitle"))
 
 # Search by tag
-curl -s "$GRAFANA_BASE_URL/api/search?tag=<tag-name>&limit=20" \
-  -H "Cookie: grafana_session=$GRAFANA_SESSION" \
-  | jq '.[] | {title, uid}'
+result = tool_request("grafana", "GET", f"{base}/api/search?tag=<tag-name>&limit=20")
+for item in result.get("json") or []:
+    print(item.get("title"), item.get("uid"))
 ```
 
 ---
 
 ## Query live metric data
 
-```bash
-export $(grep -v '^#' .env | grep 'GRAFANA_' | xargs)
+```python
+import time
+from shared_utils.browser import load_env_file, DEFAULT_ENV_FILE
+from shared_utils.session_request import tool_request
+
+env = load_env_file(DEFAULT_ENV_FILE)
+base = env["GRAFANA_BASE_URL"].rstrip("/")
 
 # Execute a PromQL query (instant vector)
-curl -s "$GRAFANA_BASE_URL/api/datasources/proxy/uid/{datasource_uid}/api/v1/query" \
-  -H "Cookie: grafana_session=$GRAFANA_SESSION" \
-  --data-urlencode "query=up" \
-  --data-urlencode "time=$(date +%s)" \
-  | jq '.data.result[] | {metric, value: .value[1]}'
+result = tool_request(
+    "grafana", "GET",
+    f"{base}/api/datasources/proxy/uid/{{datasource_uid}}/api/v1/query?query=up&time={int(time.time())}",
+)
+for row in (result.get("json") or {}).get("data", {}).get("result", []):
+    print(row.get("metric"), row.get("value", [None, None])[1])
 
 # Find datasource UIDs
-curl -s "$GRAFANA_BASE_URL/api/datasources" \
-  -H "Cookie: grafana_session=$GRAFANA_SESSION" \
-  | jq '.[] | {uid, name, type}'
+result = tool_request("grafana", "GET", f"{base}/api/datasources")
+for ds in result.get("json") or []:
+    print(ds.get("uid"), ds.get("name"), ds.get("type"))
 ```
 
 ---

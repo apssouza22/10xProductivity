@@ -5,13 +5,20 @@ description: Slack — two complementary modes. (1) Slack AI: post a natural-lan
 env_vars:
   - SLACK_XOXC
   - SLACK_D_COOKIE
+  - SLACK_WORKSPACE_URL
+sniffer:
+  profile: ~/.browser_automation/slack_profile
+  url: ${SLACK_WORKSPACE_URL}
+  filter: /api/
 ---
 
 # Slack
 
-Access is via your own user session (`xoxc` client token) extracted after SSO — no Slack app installation or admin approval needed.
+Access is via your own user session extracted after SSO into a persistent browser profile (`~/.browser_automation/slack_profile/`) — no Slack app installation or admin approval needed.
 
-Env: `SLACK_XOXC`, `SLACK_D_COOKIE` (long-lived user session; refresh via `python3 shared_utils/playwright_sso.py --slack-only` only when the session stops working)
+Env: `SLACK_WORKSPACE_URL`, `SLACK_XOXC`, `SLACK_D_COOKIE` (written by `sso.py`; refresh via `python3 shared_utils/playwright_sso.py --slack-only` when the session stops working)
+
+**API calls:** use `shared_utils/session_request.py` — it reuses the saved browser profile and extracts `xoxc` + `d` automatically. Do not call `urllib` or `curl` directly for Slack.
 
 Multiple Slack workspaces are supported with account-scoped env keys:
 `SLACK_ACME_WORKSPACE_URL`, `SLACK_ACME_XOXC`, `SLACK_ACME_D_COOKIE`
@@ -22,16 +29,11 @@ Multiple Slack workspaces are supported with account-scoped env keys:
 ## Verify connection
 
 ```python
-# ⚠ Always use Python to load .env — bash truncates long xoxc tokens silently
-from pathlib import Path
-env = {k.strip(): v.strip() for line in Path(".env").read_text().splitlines()
-       if "=" in line and not line.startswith("#") for k, v in [line.split("=", 1)]}
-import urllib.request, json, ssl
-ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
-req = urllib.request.Request("https://slack.com/api/auth.test",
-    headers={"Authorization": f"Bearer {env['SLACK_XOXC']}", "Cookie": f"d={env['SLACK_D_COOKIE']}"})
-r = json.loads(urllib.request.urlopen(req, context=ctx, timeout=10).read())
-print(r.get("ok"), r.get("user"), r.get("team"))
+from shared_utils.session_request import tool_request
+
+result = tool_request("slack", "GET", "https://slack.com/api/auth.test")
+data = result.get("json") or {}
+print(data.get("ok"), data.get("user"), data.get("team"))
 # → True alice your-workspace
 ```
 
@@ -112,46 +114,33 @@ the opened browser manually or capture from an already trusted browser session.
 **⚠ Key gotcha:** Response arrives in ~0.2s — poll immediately with 1s sleep, not with long delay
 
 ```python
-import json, ssl, time, urllib.request, urllib.parse
-from pathlib import Path
+import json, time
+from shared_utils.session_request import tool_request
 
-env = {k.strip(): v.strip() for line in Path(".env").read_text().splitlines()
-       if "=" in line and not line.startswith("#") for k, v in [line.split("=", 1)]}
-xoxc, d = env["SLACK_XOXC"], env["SLACK_D_COOKIE"]
-
-ssl_ctx = ssl.create_default_context()
-ssl_ctx.check_hostname = False
-ssl_ctx.verify_mode = ssl.CERT_NONE
-
-def api(method, endpoint, data=None, params=None):
+def slack_api(method, endpoint, data=None, params=None):
     url = f"https://slack.com/api/{endpoint}"
     if params:
-        url += "?" + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url,
-        data=json.dumps(data).encode() if data else None,
-        headers={"Authorization": f"Bearer {xoxc}", "Cookie": f"d={d}",
-                 "Content-Type": "application/json; charset=utf-8"},
-        method=method)
-    with urllib.request.urlopen(req, context=ssl_ctx, timeout=15) as resp:
-        return json.loads(resp.read())
+        from urllib.parse import urlencode
+        url += "?" + urlencode(params)
+    result = tool_request("slack", method, url, body=data)
+    return result.get("json") or json.loads(result.get("body") or "{}")
 
 # Get Slackbot DM ID (USLACKBOT is fixed across all workspaces)
-r = api("POST", "conversations.open", {"users": "USLACKBOT"})
+r = slack_api("POST", "conversations.open", {"users": "USLACKBOT"})
 slackbot_dm = r["channel"]["id"]
 
 # Post question
-r = api("POST", "chat.postMessage", {"channel": slackbot_dm, "text": "how do we handle on-call escalations?"})
+r = slack_api("POST", "chat.postMessage", {"channel": slackbot_dm, "text": "how do we handle on-call escalations?"})
 msg_ts = r["ts"]
 
 # Poll for AI response (arrives in ~0.2s, poll with 1s sleep)
 for _ in range(60):
     time.sleep(1)
-    r = api("GET", "conversations.replies", params={"channel": slackbot_dm, "ts": msg_ts, "limit": "20"})
+    r = slack_api("GET", "conversations.replies", params={"channel": slackbot_dm, "ts": msg_ts, "limit": "20"})
     ai_replies = [m for m in r.get("messages", [])
                   if float(m.get("ts", "0")) > float(msg_ts)
                   and m.get("subtype") in {"ai", "ai_complete"}]
     if ai_replies:
-        # Parse blocks to extract answer (you can access msg["blocks"] for rich text, or msg["text"] for plain)
         print(ai_replies[-1])
         break
 ```

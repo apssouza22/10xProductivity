@@ -1,8 +1,8 @@
 """
 Grafana SSO capture — plugin for playwright_sso.py discovery.
 
-Navigates to your Grafana instance, completes SSO login, and captures
-the grafana_session cookie.
+Navigates to your Grafana instance via a persistent browser profile, completes
+SSO login, and captures the grafana_session cookie.
 
 Standalone usage:
     python3 tool_connections/grafana/sso.py
@@ -11,6 +11,7 @@ Standalone usage:
 
 import sys
 import time
+from pathlib import Path
 
 try:
     from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
@@ -20,35 +21,39 @@ except ImportError:
     os.system(f"{sys.executable} -m playwright install chromium -q")
     from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
-import ssl
-import urllib.request
-
 TOOL_NAME = "grafana"
 ENV_KEYS = ["GRAFANA_SESSION"]
+ACCOUNT_ENV_KEYS = ["GRAFANA_BASE_URL"]
+
+
+def _profile_dir() -> Path:
+    sys.path.insert(0, str(Path(__file__).parents[2]))
+    from shared_utils.browser import BROWSER_AUTOMATION_DIR
+    return BROWSER_AUTOMATION_DIR / "grafana_profile"
 
 
 def check(env: dict) -> bool:
-    """Return True if GRAFANA_SESSION is valid."""
-    session = env.get("GRAFANA_SESSION", "")
+    """Return True if the Grafana browser session is valid."""
     base = env.get("GRAFANA_BASE_URL", "")
-    if not session or not base or "yourcompany" in base:
+    if not base or "yourcompany" in base:
         return False
     try:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        req = urllib.request.Request(
+        sys.path.insert(0, str(Path(__file__).parents[2]))
+        from shared_utils.session_request import tool_request
+
+        result = tool_request(
+            "grafana",
+            "GET",
             f"{base.rstrip('/')}/api/user",
-            headers={"Cookie": f"grafana_session={session}"},
+            warmup_url=base,
         )
-        with urllib.request.urlopen(req, context=ctx, timeout=8) as r:
-            return r.status == 200
+        return result.get("ok") is True
     except Exception:
         return False
 
 
 def capture(env: dict) -> dict:
-    """Open Grafana in headed browser, complete SSO, return grafana_session cookie."""
+    """Open Grafana in a persistent profile, complete SSO, return grafana_session cookie."""
     base = env.get("GRAFANA_BASE_URL", "")
     if not base or "yourcompany" in base:
         raise RuntimeError(
@@ -56,13 +61,19 @@ def capture(env: dict) -> dict:
             "Add GRAFANA_BASE_URL=https://grafana.yourcompany.com and retry."
         )
 
+    profile = _profile_dir()
+    profile.mkdir(parents=True, exist_ok=True)
     print(f"  Opening Grafana ({base}) — SSO should auto-complete...")
+    print(f"  Profile: {profile}")
+
     with sync_playwright() as p:
-        browser = p.chromium.launch(
+        ctx = p.chromium.launch_persistent_context(
+            str(profile),
+            channel="chrome",
             headless=False,
+            ignore_https_errors=True,
             args=["--window-size=1200,800", "--window-position=100,100"],
         )
-        ctx = browser.new_context(ignore_https_errors=True)
         page = ctx.new_page()
         page.goto(base, wait_until="networkidle", timeout=60_000)
         time.sleep(2)
@@ -88,11 +99,9 @@ def capture(env: dict) -> dict:
                         next_heartbeat = time.time() + 15
             except KeyboardInterrupt:
                 ctx.close()
-                browser.close()
                 raise RuntimeError("Aborted by user — Grafana login did not complete.")
 
         ctx.close()
-        browser.close()
 
     if not session:
         raise RuntimeError("No grafana_session cookie captured.")
@@ -103,6 +112,7 @@ def capture(env: dict) -> dict:
 
 if __name__ == "__main__":
     import argparse
+    import re
     from pathlib import Path
 
     sys.path.insert(0, str(Path(__file__).parents[2]))
@@ -117,7 +127,6 @@ if __name__ == "__main__":
                 if "=" in line and not line.startswith("#") for k, v in [line.split("=", 1)]}
 
     def _write_env(tokens):
-        import re
         ENV_FILE.parent.mkdir(parents=True, exist_ok=True)
         content = ENV_FILE.read_text() if ENV_FILE.exists() else ""
         for key, value in tokens.items():

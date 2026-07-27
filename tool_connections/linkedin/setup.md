@@ -49,35 +49,12 @@ python3 personal/linkedin/sso.py --force
 ## Verify
 
 ```python
-import sys, time
-from pathlib import Path
-sys.path.insert(0, ".")
-from shared_utils.browser import sync_playwright, DEFAULT_ENV_FILE, load_env_file
+from shared_utils.session_request import tool_request
 
-PROFILE_DIR = Path.home() / ".browser_automation" / "linkedin_profile"
-env = load_env_file(DEFAULT_ENV_FILE)
-li_at = env["LINKEDIN_LI_AT"]
-csrf = env["LINKEDIN_JSESSIONID"].strip('"')
-
-with sync_playwright() as p:
-    PROFILE_DIR.mkdir(parents=True, exist_ok=True)
-    ctx = p.chromium.launch_persistent_context(
-        str(PROFILE_DIR), headless=False,
-        args=["--window-size=1024,768"], ignore_https_errors=True,
-    )
-    page = ctx.new_page()
-    page.goto("https://www.linkedin.com/feed/", wait_until="domcontentloaded", timeout=30000)
-    time.sleep(2)
-    r = page.evaluate(f"""async () => {{
-        const r = await fetch('/voyager/api/me', {{
-            headers: {{'Csrf-Token': '{csrf}', 'X-RestLi-Protocol-Version': '2.0.0', 'Accept': 'application/json'}}
-        }});
-        return {{status: r.status, body: await r.json()}};
-    }}""")
-    mini = r['body']['miniProfile']
-    print(r['status'], mini['firstName'], mini['lastName'])
-    # → 200 Alice Smith
-    ctx.close()
+result = tool_request("linkedin", "GET", "https://www.linkedin.com/voyager/api/me")
+mini = result["json"]["miniProfile"]
+print(result["status"], mini["firstName"], mini["lastName"])
+# → 200 Alice Smith
 ```
 
 **Connection details:** `tool_connections/linkedin/connection-session-cookie.md`

@@ -15,7 +15,7 @@ This file is for your agent. Point your agent here first:
 - Run every command yourself. Never paste a command and ask the user to run it.
 - **NEVER read `TENX_PRIVATE_DIR/.env` directly** Always run the tool's `check()` via `playwright_sso.py` or `sso.py`
 - **Ask for a URL first.** For any tool, the best minimal input is a URL the user already has open (a ticket, a message link, a dashboard URL). It reveals the base URL, workspace, and regional variant — without requiring the user to know anything about auth.
-- **Infer the auth method from the URL, then try it.** Check the tool's `setup.md` to determine the auth method. For SSO/browser-session tools, attempt Playwright immediately — no further questions needed. For API token tools, run the tool's `check()` via `playwright_sso.py` or `sso.py` — the token may already be there.
+- **Infer the auth method from the URL, then try it.** Check the tool's `setup.md` to determine the auth method. **Always try browser session auth first** (persistent profile + `session_request.py`) for SSO/session-cookie tools — no further questions needed. For API token tools, run the tool's `check()` via `playwright_sso.py` or `sso.py` — the token may already be there.
 - **Ask for credentials only if actually missing, and only for the specific thing that's missing.** Never ask vague questions like "do you have credentials?" Know what you need before you ask.
 - When you must ask, phrase it in plain language — not in technical terms.
 - As soon as you have what you need, do the work and verify it yourself. Tell the user what succeeded, not what they need to do next.
@@ -96,7 +96,7 @@ For each tool the user selected, follow this routing in order — stop at the fi
 
 **Validation is mandatory on all paths.** Run the verify snippet and confirm it returns expected output before marking a tool as done.
 
-**SSO tools need bootstrapping first.** For tools that use browser session auth (Slack, Grafana, Google Drive, etc.), credentials are not manually filled in — they are written to `TENX_PRIVATE_DIR/.env` by `playwright_sso.py`. The verify snippet will fail with a missing key error until you run the SSO script at least once. Check the tool's `setup.md` for the exact command (usually `source .venv/bin/activate && python3 shared_utils/playwright_sso.py --tool-only`).
+**SSO tools need bootstrapping first.** For tools that use browser session auth (Slack, Grafana, Google Drive, etc.), credentials are written to `TENX_PRIVATE_DIR/.env` by `playwright_sso.py` and API calls use `shared_utils/session_request.py` against the persistent profile in `~/.browser_automation/`. The verify snippet will fail until you run the SSO script at least once. Check the tool's `setup.md` for the exact command (usually `source .venv/bin/activate && python3 shared_utils/playwright_sso.py --tool-only`).
 
 ---
 

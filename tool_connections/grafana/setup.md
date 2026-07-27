@@ -33,14 +33,16 @@ On managed machines with enterprise SSO it completes automatically (~20–30s). 
 
 ## Verify
 
-```bash
-export $(grep -v '^#' .env | grep 'GRAFANA_' | xargs)
-curl -s "$GRAFANA_BASE_URL/api/user" \
-  -H "Cookie: grafana_session=$GRAFANA_SESSION" \
-  | jq '{login, email, name}'
+```python
+from shared_utils.browser import load_env_file, DEFAULT_ENV_FILE
+from shared_utils.session_request import tool_request
+
+env = load_env_file(DEFAULT_ENV_FILE)
+base = env["GRAFANA_BASE_URL"].rstrip("/")
+result = tool_request("grafana", "GET", f"{base}/api/user")
+print(result.get("json"))
 # → {"login": "alice", "email": "alice@example.com", "name": "Alice Smith"}
 # If 401/redirect: session expired — run playwright_sso.py --grafana-only to refresh
-# If connection refused: check GRAFANA_BASE_URL in .env
 ```
 
 **Connection details:** `tool_connections/grafana/connection-sso.md`

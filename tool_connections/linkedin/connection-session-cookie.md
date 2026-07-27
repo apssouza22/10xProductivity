@@ -5,6 +5,10 @@ description: LinkedIn — personal use via browser session cookie. Read/send mes
 env_vars:
   - LINKEDIN_LI_AT
   - LINKEDIN_JSESSIONID
+sniffer:
+  profile: ~/.browser_automation/linkedin_profile
+  url: https://www.linkedin.com/feed/
+  filter: /voyager/api
 ---
 
 # LinkedIn — session cookie (li_at)
@@ -31,32 +35,16 @@ LINKEDIN_JSESSIONID=your-jsessionid-value        # CSRF token (~24h, re-captured
 
 ## Auth
 
-All Voyager API calls are made from within a Playwright page context (injecting the cookies), because LinkedIn's bot detection blocks raw `urllib` calls. `JSESSIONID` doubles as the CSRF token (`Csrf-Token` header).
+All Voyager API calls go through `shared_utils/session_request.py` (`tool_request("linkedin", ...)`) — it reuses the persistent profile and sets the CSRF token from the `JSESSIONID` cookie automatically. Raw `urllib` or `curl` calls are blocked by LinkedIn bot detection.
 
 **Important:** Always use the persistent profile (`~/.browser_automation/linkedin_profile/`) so LinkedIn doesn't trigger 2FA on every run.
 
 ```python
-import sys, time
-from pathlib import Path
-sys.path.insert(0, ".")
-from shared_utils.browser import sync_playwright, DEFAULT_ENV_FILE, load_env_file
+from shared_utils.session_request import tool_request
 
-PROFILE_DIR = Path.home() / ".browser_automation" / "linkedin_profile"
-
-def linkedin_page(p):
-    """Open a Playwright page pre-authenticated with LinkedIn session cookies."""
-    env = load_env_file(DEFAULT_ENV_FILE)
-    li_at = env["LINKEDIN_LI_AT"]
-    jsession = env["LINKEDIN_JSESSIONID"].strip('"')
-    PROFILE_DIR.mkdir(parents=True, exist_ok=True)
-    ctx = p.chromium.launch_persistent_context(
-        str(PROFILE_DIR), headless=False,
-        args=["--window-size=1024,768"], ignore_https_errors=True,
-    )
-    page = ctx.new_page()
-    page.goto("https://www.linkedin.com/feed/", wait_until="domcontentloaded", timeout=30000)
-    time.sleep(2)
-    return ctx, page, jsession
+result = tool_request("linkedin", "GET", "https://www.linkedin.com/voyager/api/me")
+mini = result["json"]["miniProfile"]
+print(mini["firstName"], mini["lastName"])
 ```
 
 ---
@@ -66,18 +54,12 @@ def linkedin_page(p):
 ### Get your own profile
 
 ```python
-with sync_playwright() as p:
-    ctx, page, csrf = linkedin_page(p)
-    r = page.evaluate(f"""async () => {{
-        const r = await fetch('/voyager/api/me', {{
-            headers: {{'Csrf-Token': '{csrf}', 'X-RestLi-Protocol-Version': '2.0.0', 'Accept': 'application/json'}}
-        }});
-        return {{status: r.status, body: await r.json()}};
-    }}""")
-    mini = r['body']['miniProfile']
-    print(mini['firstName'], mini['lastName'], mini['publicIdentifier'])
-    # → Alice Smith alice-smith-123456
-    ctx.close()
+from shared_utils.session_request import tool_request
+
+result = tool_request("linkedin", "GET", "https://www.linkedin.com/voyager/api/me")
+mini = result["json"]["miniProfile"]
+print(mini["firstName"], mini["lastName"], mini["publicIdentifier"])
+# → Alice Smith alice-smith-123456
 ```
 
 ### List conversations
