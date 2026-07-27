@@ -43,7 +43,7 @@ Dedicated automation accounts (separate from day-to-day personal use) are accept
 
 1. **`TENX_PRIVATE_DIR/personal/` first, always.** All work — new tools, improvements to existing connections, new auth variants, fixes — starts in `TENX_PRIVATE_DIR/personal/`. Never edit `tool_connections/` directly. `TENX_PRIVATE_DIR/personal/` lives outside the public repo and is safe for your email, org URLs, tokens, and company-specific details. Nothing leaves `TENX_PRIVATE_DIR/personal/` until it is verified, scrubbed, and promoted via `staging/` → PR. This applies to improvements just as much as new tools.
 2. **Research viability first.** Before asking the user for anything, determine what auth methods exist for this tool. Prefer a supported API. If no suitable API exists, treat Agent Browser over an authenticated browser session as the default operational fallback; do not jump straight to a custom Playwright/CDP script.
-3. **Ask only what the auth method actually needs.** The credential ask must be proportional to the auth method: SSO/browser-session → ask for nothing (just a URL to confirm the instance); API token → ask for the token and where to generate it; username+password → ask for both. Never ask vague questions the user can't answer.
+3. **Ask only what the auth method actually needs.** The credential ask must be proportional to the auth method: browser session → ask for nothing (just a URL to confirm the instance); API token → ask for the token and where to generate it; username+password → ask for both. Never ask vague questions the user can't answer.
 4. **A URL is your best minimal input.** If you need to confirm an instance, ask for any URL from that tool (profile page, dashboard, ticket). It reveals the base URL, regional variant, and proves the user has access — without requiring them to know anything about auth.
 5. **Run before you write.** Every snippet must be code you actually executed and saw succeed against a live instance. No copy-paste from docs. No illustrative output. The reason you haven't run them does not matter — unverified snippets do not belong in a connection file.
 6. **Write for the next agent.** Strip session-specific IDs, one-time URLs, org-specific data. Document the pattern, not the artifact.
@@ -86,16 +86,17 @@ Before asking the user for anything:
 
 | Priority | Auth method                                      | User friction                                    | Ask the user for                   |
 | -------- | ------------------------------------------------ | ------------------------------------------------ | ---------------------------------- |
-| 1        | **Browser session (persistent profile)**         | Near-zero — reuse authenticated browser state    | Usually nothing (a URL if first setup) |
-| 2        | **Agent Browser + one-time browser login**       | Low — user signs in once, session persists       | A URL from the tool                |
-| 3        | **Supported API token / preconfigured OAuth**    | Near-zero — token or authorize click             | Only what the supported flow needs |
+| 1        | **Browser session (persistent profile)**         | Low — sign in once in the browser, session persists | A URL from the tool             |
+| 2        | **Supported API token / preconfigured OAuth**    | Near-zero — token or authorize click             | Only what the supported flow needs |
+| 3        | **Agent Browser + one-time browser login**       | Low — user signs in once, session persists       | A URL from the tool                |
 | 4        | **Custom CDP/Playwright automation**             | Higher maintenance — tool-specific code          | A URL from the tool                |
 | 5        | **Username + password**                          | Low — but only for legacy tools                  | Username and password              |
 | ✗        | **OAuth requiring user to create their own app** | High — stop, do not use                          | N/A                                |
 
 
-**Browser session API calls:** when a tool uses browser session auth (`auth: sso-session` or `auth: session-cookie`), all HTTP calls must go through `shared_utils/session_request.py` — not raw `urllib`, `curl`, or `requests`. 
-Auth tokens and cookies stay in the shared browser profile at `~/.browser_automation/profile/` — never in `.env`. One company SSO login covers every browser-session tool. Only non-secret config (instance URLs) belongs in `.env`. Add a `sniffer:` block to the connection frontmatter (profile + warmup URL) so `tool_request("tool-name", ...)` can reuse the saved profile.
+**Choosing an auth method:** When a tool supports both browser session and API token, **try browser session first** — run `playwright_sso.py` and verify with `session_request.py`. Fall back to API token only if browser session fails or the instance blocks REST access from the profile.
+
+**Browser session API calls:** when a tool uses browser session auth (`auth: sso-session` or `auth: session-cookie`), all HTTP calls must go through `shared_utils/session_request.py` — not raw `urllib`, `curl`, or `requests`. Auth tokens and cookies stay in the shared browser profile at `~/.browser_automation/profile/` — never in `.env`. Only non-secret config (instance URLs) belongs in `.env`. Add a `sniffer:` block to the connection frontmatter (profile + warmup URL) so `tool_request("tool-name", ...)` can reuse the saved profile.
 
 
 **Browser fallback rule:** when no suitable API is available, use Agent Browser
@@ -118,7 +119,7 @@ submit through a normal authenticated UI.
 
 **Stop and explain** if the only viable path requires the user to create an app or register OAuth credentials. Don't propose it as an option — it violates this repo's zero-friction goal.
 
-**SSO-only tools:** If the tool uses enterprise SSO and has no API token path, the only option is browser session capture (Priority 1). This is fine — but do three things:
+**Browser-session-only tools:** If the tool has no API token path and only supports signing in through a browser, browser session capture is the option. This is fine — but do three things:
 
 1. Write a plugin-compliant `sso.py` in `TENX_PRIVATE_DIR/personal/{tool-name}/` (not `tool_connections/`) with `TOOL_NAME`, `check(env) -> bool`, and `capture(env) -> dict`. `capture()` ensures the user is logged in via the shared profile at `~/.browser_automation/profile/` and returns only config keys listed in `CONFIG_ENV_KEYS` (if any).
 2. Document the refresh command in the connection file: `python3 "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal/{tool-name}/sso.py"` — the agent cannot self-refresh without the user present.

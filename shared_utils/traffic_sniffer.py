@@ -141,9 +141,16 @@ def _load_tool_config(tool_name: str) -> dict:
         TENX_PRIVATE_DIR / "personal" / "tool_connections" / tool_name,
         _REPO_ROOT / "tool_connections" / tool_name,
     ]
-    candidates = []
+    candidates: list[Path] = []
     for tool_dir in candidate_dirs:
-        candidates.extend(tool_dir.glob("connection-*.md"))
+        found = list(tool_dir.glob("connection-*.md"))
+        if found:
+            # Prefer browser-session recipe when both sso and api-token exist.
+            candidates = sorted(
+                found,
+                key=lambda p: (0 if "connection-sso" in p.name else 1, p.name),
+            )
+            break
     if not candidates:
         searched = "\n".join(f"  - {_display_path(p)}/connection-*.md" for p in candidate_dirs)
         raise FileNotFoundError(

@@ -1,5 +1,5 @@
 """
-Slack SSO capture — plugin for playwright_sso.py discovery.
+Slack browser session capture — plugin for playwright_sso.py discovery.
 
 Opens the Slack workspace in the shared browser profile. Auth (xoxc token,
 d cookie, localStorage) stays in ~/.browser_automation/profile/ — not
@@ -168,7 +168,7 @@ def capture(env: dict) -> dict:
 
     profile = _profile_dir(env)
     profile.mkdir(parents=True, exist_ok=True)
-    print(f"  Opening Slack ({workspace_url}) — SSO should auto-complete...")
+    print(f"  Opening Slack ({workspace_url}) — complete sign-in in the browser if prompted...")
     print(f"  Profile: {profile}")
 
     with sync_playwright() as p:

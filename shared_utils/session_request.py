@@ -60,6 +60,10 @@ _TOOL_DEFAULTS: dict[str, dict[str, Any]] = {
         "headers": {"Content-Type": "application/json; charset=utf-8"},
     },
     "grafana": {},
+    "confluence": {
+        "via_page_fetch": True,
+        "headers": {"Accept": "application/json"},
+    },
 }
 
 
@@ -155,6 +159,17 @@ def _slack_auth_headers(page, ctx, warmup_url: str) -> dict[str, str]:
     headers = {"Authorization": f"Bearer {xoxc}"}
     if d_cookie:
         headers["Cookie"] = f"d={d_cookie}"
+    return headers
+
+
+def _confluence_auth_headers(page, ctx, warmup_url: str) -> dict[str, str]:
+    """Atlassian Cloud needs X-Atlassian-Token; optional XSRF from cookie."""
+    headers: dict[str, str] = {}
+    if "atlassian.net" in warmup_url.lower():
+        headers["X-Atlassian-Token"] = "no-check"
+        xsrf = _cookie_value(ctx, "atlassian.xsrf.token", warmup_url)
+        if xsrf:
+            headers["atl-xsrf-token"] = xsrf.strip('"')
     return headers
 
 
@@ -318,7 +333,7 @@ def session_request(
             if warmup_url:
                 _log(f"  Warmup: {warmup_url}", json_mode=json_mode)
                 page.goto(warmup_url, wait_until="domcontentloaded", timeout=timeout_ms)
-                if _looks_like_login(page.url):
+                if _looks_like_login(page.url) and not via_page_fetch:
                     return {
                         "ok": False,
                         "error": f"Session not logged in — redirected to {page.url}",
@@ -381,6 +396,8 @@ def _resolve_profile_and_warmup(
 def _tool_post_warmup_headers(tool: str) -> Callable[[Any, Any, str], dict[str, str]] | None:
     if tool == "slack":
         return _slack_auth_headers
+    if tool == "confluence":
+        return _confluence_auth_headers
     return None
 
 

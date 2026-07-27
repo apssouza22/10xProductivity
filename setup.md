@@ -15,7 +15,7 @@ This file is for your agent. Point your agent here first:
 - Run every command yourself. Never paste a command and ask the user to run it.
 - **NEVER read `TENX_PRIVATE_DIR/.env` directly** Always run the tool's `check()` via `playwright_sso.py` or `sso.py`
 - **Ask for a URL first.** For any tool, the best minimal input is a URL the user already has open (a ticket, a message link, a dashboard URL). It reveals the base URL, workspace, and regional variant — without requiring the user to know anything about auth.
-- **Infer the auth method from the URL, then try it.** Check the tool's `setup.md` to determine the auth method. **Always try browser session auth first** (persistent profile + `session_request.py`) for SSO/session-cookie tools — no further questions needed. For API token tools, run the tool's `check()` via `playwright_sso.py` or `sso.py` — the token may already be there.
+- **Infer the auth method from the URL, then try it.** Check the tool's `setup.md`. **Try browser session first** when the tool documents it (persistent profile + `session_request.py`) — usually only a URL is needed. Fall back to API token only if browser session fails or the setup lists no browser path.
 - **Ask for credentials only if actually missing, and only for the specific thing that's missing.** Never ask vague questions like "do you have credentials?" Know what you need before you ask.
 - When you must ask, phrase it in plain language — not in technical terms.
 - As soon as you have what you need, do the work and verify it yourself. Tell the user what succeeded, not what they need to do next.
@@ -96,7 +96,7 @@ For each tool the user selected, follow this routing in order — stop at the fi
 
 **Validation is mandatory on all paths.** Run the verify snippet and confirm it returns expected output before marking a tool as done.
 
-**SSO tools need bootstrapping first.** All browser-session tools share one Chromium profile at `~/.browser_automation/profile/`. Log in once via company SSO — Slack, Grafana, LinkedIn, and every other connected tool reuse that session. Auth never goes in `.env`; only instance URLs (e.g. `SLACK_WORKSPACE_URL`, `GRAFANA_BASE_URL`) do. Run `playwright_sso.py` at least once per tool (or once total if the first login covers your IdP). API calls use `shared_utils/session_request.py`.
+**Browser-session tools need bootstrapping.** When a connection uses browser session auth (`auth: sso-session` or `auth: session-cookie` in frontmatter), auth stays in the shared profile at `~/.browser_automation/profile/` — not in `.env`. Only instance URLs go in `.env`. Run `playwright_sso.py` for that tool before the verify snippet. API calls use `shared_utils/session_request.py`.
 
 ---
 
@@ -133,7 +133,7 @@ Note: {any critical gotcha that would cause silent failure}  ← omit if none
 - **Instance** — the real URL the verify snippet hit (e.g. `https://jira.company.example`, not `https://jira.yourcompany.com`). Include prod vs dev if both exist.
 - **Auth** — the method that actually passed verification. For browser-session tools, cite `~/.browser_automation/profile/` (shared across all tools). For API-token tools, name the header format; for Cloud vs Server/DC variants (Jira, Confluence), name the variant explicitly. Never list session tokens in verified_connections.
 - **Active env** — only vars that are populated with real values. If a var is present in `TENX_PRIVATE_DIR/.env` but is a placeholder (e.g. `you@yourcompany.com`), omit it and add a Note explaining it should be ignored.
-- **Refresh** — include for any token with a lifetime under ~24h (SSO sessions, Coveo JWTs, xoxc). Omit for long-lived API tokens and PATs.
+- **Refresh** — include for any short-lived browser session or token (often ~8h). Omit for long-lived API tokens and PATs.
 - **Note** — include only if there is a silent failure risk: a placeholder var that must be ignored, a CLI that must be used instead of REST, a required prerequisite (VPN, `/etc/hosts`, Zscaler), or a common misidentification (e.g. PHX-XXXXX vs PHOENIX-XXXX).
 
 The preamble (frontmatter + intro block) comes from `verified_connections.example.md` — copy it to `TENX_PRIVATE_DIR/verified_connections.md` on first run, then only append sections for each new tool.

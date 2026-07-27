@@ -1,33 +1,33 @@
 ---
 name: grafana-setup
-description: Set up Grafana connection. Auth is SSO browser session. Only input needed from the user is the Grafana URL.
+description: Set up Grafana connection. Auth is browser session. Only input needed from the user is the Grafana URL.
 ---
 
 # Grafana — Setup
 
-## Auth method: SSO browser session
+## Auth method: browser session
 
-Grafana session cookies are captured after SSO login. No API token page needed for SSO-based instances.
+Grafana is accessed through a browser session in the shared profile. No API token page needed for instances that support web login.
 
 **What to ask the user:** "Share your Grafana URL" (e.g. `https://grafana.acme.com`).
 
-That is the only input needed. Set `GRAFANA_BASE_URL` in `.env`, then run the SSO script.
+That is the only input needed. Set `GRAFANA_BASE_URL` in `.env`, then capture the session.
 
-> **Alternative:** If your Grafana instance uses API keys instead of SSO, use `connection-api-key.md` instead (ask for the API key directly — no browser automation needed).
+> **Alternative:** If your Grafana instance uses API keys instead of web login, use `connection-api-key.md` instead (ask for the API key directly — no browser automation needed).
 
 ---
 
-## Steps (SSO)
+## Steps
 
 1. Set `GRAFANA_BASE_URL` in `.env` from the URL the user provided
-2. Run the SSO script:
+2. Capture the browser session:
 
 ```bash
 source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --grafana-only
 ```
 
-On managed machines with enterprise SSO it completes automatically (~20–30s). On personal machines, complete the Grafana login once through the browser. Session is saved to `~/.browser_automation/profile/`.
+Sign in through the browser if prompted. Session is saved to `~/.browser_automation/profile/`.
 
 ---
 
@@ -67,4 +67,4 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --grafana-only
 ```
 
-Token TTL: ~8h.
+Session TTL: ~8h.

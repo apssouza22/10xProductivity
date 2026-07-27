@@ -1,5 +1,5 @@
 """
-Grafana SSO capture — plugin for playwright_sso.py discovery.
+Grafana browser session capture — plugin for playwright_sso.py discovery.
 
 Opens Grafana via a persistent browser profile. The grafana_session cookie
 stays in the shared browser profile at ~/.browser_automation/profile/ — not in .env.
@@ -63,7 +63,7 @@ def capture(env: dict) -> dict:
 
     profile = _profile_dir()
     profile.mkdir(parents=True, exist_ok=True)
-    print(f"  Opening Grafana ({base}) — SSO should auto-complete...")
+    print(f"  Opening Grafana ({base}) — complete sign-in in the browser if prompted...")
     print(f"  Profile: {profile}")
 
     with sync_playwright() as p:

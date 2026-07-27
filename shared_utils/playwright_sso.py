@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-SSO session refresher — discovery orchestrator.
+Browser session refresher — discovery orchestrator.
 
 Discovers all tool_connections/*/sso.py plugins and delegates to them.
 Each plugin exposes: TOOL_NAME, check(env) -> bool, capture(env) -> dict.
 Optional CONFIG_ENV_KEYS lists non-secret config vars that may be written to
-.env (instance URLs, workspace URLs). Auth tokens and cookies stay in the
-shared browser profile at ~/.browser_automation/profile/ — never in .env.
-Log in once via company SSO; every tool reuses that session.
+.env (instance URLs, workspace URLs). Auth stays in the shared browser profile
+at ~/.browser_automation/profile/ — never in .env.
 
 Usage:
     python3 playwright_sso.py                  # refresh all expired sessions
@@ -198,7 +197,7 @@ def main():
     targets = {name: mod for name, mod in plugins.items()
                if not any_only or only_flags.get(name)}
 
-    print("SSO session refresher")
+    print("Browser session refresher")
     print(f"  .env (config only): {args.env_file}")
     print(f"  Shared auth profile: {SHARED_BROWSER_PROFILE}")
     print()

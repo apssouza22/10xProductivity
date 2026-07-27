@@ -52,8 +52,9 @@ DEFAULT_ENV_FILE = private_path(".env")
 # Auth tokens and cookies stay in the profile — never copy them to .env.
 BROWSER_AUTOMATION_DIR = Path.home() / ".browser_automation"
 
-# One Chromium profile for every browser-session tool. Log in once (company SSO)
-# and Slack, Grafana, LinkedIn, etc. all reuse the same cookies and storage.
+# One Chromium profile for every browser-session tool. Sessions for different
+# sites share the same profile directory; logging into one tool may reuse cookies
+# for another when the instance allows it.
 SHARED_BROWSER_PROFILE = BROWSER_AUTOMATION_DIR / "profile"
 
 

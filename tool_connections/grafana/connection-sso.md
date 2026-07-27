@@ -47,7 +47,7 @@ print(result.get("json"))
 ## Refresh session
 
 ```bash
-# Refreshes the browser profile — opens browser for SSO, ~20–30 s
+# Refreshes the browser profile — sign in through the browser if prompted
 source .venv/bin/activate
 python3 shared_utils/playwright_sso.py
 ```
@@ -145,9 +145,9 @@ for ds in result.get("json") or []:
 
 ## Notes on auth
 
-Grafana session cookies are set after SSO login (~8h TTL). On managed machines, `playwright_sso.py` completes this automatically in a headed Chromium window without user interaction. On personal machines, it opens the Grafana login page — complete login manually once, then the session is saved.
+Session cookies are stored in `~/.browser_automation/profile/`. Session lifetime varies by instance (often a few hours). Re-run `playwright_sso.py --grafana-only` when API calls return 401.
 
-If your Grafana uses API keys instead of SSO:
+If your Grafana uses API keys instead of browser session:
 ```bash
 # Alternative: API key auth (if your Grafana instance supports it)
 # GRAFANA_API_KEY=your-grafana-api-key

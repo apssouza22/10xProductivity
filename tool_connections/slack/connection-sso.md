@@ -1,7 +1,7 @@
 ---
 name: slack
 auth: sso-session
-description: Slack — two complementary modes. (1) Slack AI: post a natural-language question to the Slackbot DM and get a synthesized AI answer in ~0.2s, drawn from all Slack content you have access to. (2) search.messages: raw full-text search with Slack syntax (in:#channel, from:user, date range). Also: read channel/thread history, post messages. No Slack app install needed — xoxc user session via SSO.
+description: Slack — two complementary modes. (1) Slack AI: post a natural-language question to the Slackbot DM and get a synthesized AI answer in ~0.2s, drawn from all Slack content you have access to. (2) search.messages: raw full-text search with Slack syntax (in:#channel, from:user, date range). Also: read channel/thread history, post messages. No Slack app install needed — browser session auth.
 env_vars:
   - SLACK_WORKSPACE_URL
 sniffer:
@@ -12,7 +12,7 @@ sniffer:
 
 # Slack
 
-Access is via the **shared** browser profile (`~/.browser_automation/profile/`) — log in once via company SSO and every browser-session tool reuses it. No Slack app installation or admin approval needed.
+Access is via the shared browser profile (`~/.browser_automation/profile/`). Other browser-session tools use the same profile. No Slack app installation or admin approval needed.
 
 Env: `SLACK_WORKSPACE_URL` only (instance URL — not a secret). Auth tokens stay in the browser profile. Refresh via `python3 shared_utils/playwright_sso.py --slack-only` when the session stops working.
 
@@ -46,7 +46,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --slack-only
 ```
 
-The script opens Chromium, completes SSO, and saves the session in `~/.browser_automation/profile/`. Nothing auth-related is written to `.env`.
+The script opens Chromium. Sign in through the browser if prompted — the session is saved in `~/.browser_automation/profile/`. Nothing auth-related is written to `.env`.
 
 For a second workspace, set a scoped URL and refresh with `--account`:
 

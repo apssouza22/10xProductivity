@@ -32,6 +32,15 @@ Env: `SLACK_WORKSPACE_URL` (instance URL only). Auth: shared profile `~/.browser
 
 ---
 
+## Confluence → `tool_connections/confluence/connection-sso.md`
+
+Confluence wiki — search pages, fetch content, browse spaces via browser session. No API token required when using the shared profile.
+Env: `CONFLUENCE_BASE_URL` (include `/wiki` for Cloud). Auth: shared profile `~/.browser_automation/profile/` (refresh with `python3 shared_utils/playwright_sso.py --confluence-only`)
+
+API-token alternative: `tool_connections/confluence/connection-api-token.md`
+
+---
+
 ## Adding new connections
 
 Add `tool_connections/{tool}/connection-*.md` with core frontmatter (`name`, `auth`, `description`, `env_vars`). After verifying, append a section to `TENX_PRIVATE_DIR/verified_connections.md` following the format above.

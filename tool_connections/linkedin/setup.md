@@ -15,7 +15,7 @@ LinkedIn has no public API for personal use without app approval. This connectio
 
 ## Steps
 
-1. Run the SSO capture script:
+1. Run the session capture script:
 
 ```bash
 source .venv/bin/activate

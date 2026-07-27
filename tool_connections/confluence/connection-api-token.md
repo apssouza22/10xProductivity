@@ -10,6 +10,8 @@ env_vars:
 
 # Confluence
 
+> **Also available:** `connection-sso.md` — browser session via `~/.browser_automation/profile/`, no API token.
+
 Env: `CONFLUENCE_TOKEN`, `CONFLUENCE_EMAIL`, `CONFLUENCE_BASE_URL`
 
 **Confluence Cloud** uses HTTP Basic auth: `email:api-token` (NOT Bearer).

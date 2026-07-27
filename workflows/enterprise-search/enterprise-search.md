@@ -31,7 +31,7 @@ Read `verified_connections.md`. Note which tools are available. Only search tool
 
 ## Step 2: Search
 
-**Auth routing:** For tools with `auth: sso-session` or `auth: session-cookie` in their connection file, use `shared_utils/session_request.py` (`tool_request("tool-name", method, url)`) — not `urllib`, `curl`, or env-token headers. API-token tools (Jira, Confluence, GitHub) keep their existing token-based snippets.
+**Auth routing:** **Try browser session first** when the tool's `setup.md` documents it (`auth: sso-session` or `auth: session-cookie`) — use `shared_utils/session_request.py`. If `verified_connections.md` lists `connection-api-token.md` for a tool, or browser session returns 401, use that connection file's token-based snippets instead.
 
 **Start with Slackbot / Slack AI by default** (when Slack is connected). It is the first search for most enterprise knowledge questions because it can synthesize the current conversational record across Slack and often surfaces the practical answer fastest, especially for time-sensitive employee/process questions.
 
@@ -152,31 +152,41 @@ Slack search syntax: `in:#channel`, `from:username`, `after:2026-01-01`, `before
 
 ### Confluence
 
-Full-text CQL search across all pages.
+Full-text CQL search across all pages. **Try browser session first** (`connection-sso.md`); use API token (`connection-api-token.md`) only if browser session is not set up or returns 401.
+
+**Browser session** (`auth: sso-session`)
+
+```python
+from urllib.parse import quote
+from shared_utils.browser import load_env_file, DEFAULT_ENV_FILE
+from shared_utils.session_request import tool_request
+
+env = load_env_file(DEFAULT_ENV_FILE)
+base = env["CONFLUENCE_BASE_URL"].rstrip("/")
+keyword = "<KEYWORD>"
+
+cql = quote(f'text~"{keyword}" AND type=page')
+result = tool_request(
+    "confluence", "GET",
+    f"{base}/rest/api/content/search?cql={cql}&limit=5&expand=space",
+)
+for page in (result.get("json") or {}).get("results", []):
+    print(page.get("title"), page.get("space", {}).get("key"), page.get("id"),
+          f"{base}/pages/{page.get('id')}")
+
+# Full page body:
+# tool_request("confluence", "GET", f"{base}/rest/api/content/<PAGE_ID>?expand=body.view")
+```
+
+**API token** (`auth: api-token`)
 
 ```bash
 source .env
 
-# Search page body text
-# ⚠ Cloud: uses Basic auth (-u email:token). Server/DC: uses Bearer token (-H "Authorization: Bearer $CONFLUENCE_TOKEN")
-# Check CONFLUENCE_BASE_URL — atlassian.net = Cloud, anything else = Server/DC
-
-# Cloud
+# Cloud: Basic auth (-u email:token). Server/DC: Bearer token
 curl -s -u "$CONFLUENCE_EMAIL:$CONFLUENCE_TOKEN" \
   "$CONFLUENCE_BASE_URL/rest/api/content/search?cql=text~%22<KEYWORD>%22+AND+type=page&limit=5&expand=space" \
-  | jq '.results[] | {title, space: .space.key, id,
-      url: ("'"$CONFLUENCE_BASE_URL"'" + "/pages/" + .id)}'
-
-# Server/DC
-curl -s -H "Authorization: Bearer $CONFLUENCE_TOKEN" \
-  "$CONFLUENCE_BASE_URL/rest/api/content/search?cql=text~%22<KEYWORD>%22+AND+type=page&limit=5&expand=space" \
-  | jq '.results[] | {title, space: .space.key, id,
-      url: ("'"$CONFLUENCE_BASE_URL"'" + "/pages/" + .id)}'
-
-# To fetch the full content of a result page (same auth swap applies):
-curl -s -u "$CONFLUENCE_EMAIL:$CONFLUENCE_TOKEN" \
-  "$CONFLUENCE_BASE_URL/rest/api/content/<PAGE_ID>?expand=body.view" \
-  | jq -r '.body.view.value' | sed 's/<[^>]*>//g' | tr -s ' \n' | head -c 3000
+  | jq '.results[] | {title, space: .space.key, id}'
 ```
 
 ---
@@ -260,4 +270,4 @@ After all searches complete, give the user **one direct answer** — not a tool-
 - **Notion searches titles only.** Body text is not indexed by the API. A "no results" from Notion doesn't mean the knowledge isn't there — it may just not be in the page title.
 - **GitHub is expensive for non-code queries.** Skip it unless the query is clearly code-related; it adds noise and burns API rate limits.
 - **Confluence vs. Jira overlap:** Confluence has the narrative ("how it works"), Jira has the status ("is it done"). Both are worth searching for most topics.
-- **Credentials:** API-token tools load secrets from `.env`. Browser-session tools share auth in `~/.browser_automation/profile/` — one company SSO login covers all of them. Use `session_request.py` for API calls.
+- **Credentials:** API-token tools load secrets from `.env`. Browser-session tools keep auth in `~/.browser_automation/profile/` — use `session_request.py` for API calls; only instance URLs belong in `.env`.
