@@ -3,22 +3,20 @@ name: slack
 auth: sso-session
 description: Slack — two complementary modes. (1) Slack AI: post a natural-language question to the Slackbot DM and get a synthesized AI answer in ~0.2s, drawn from all Slack content you have access to. (2) search.messages: raw full-text search with Slack syntax (in:#channel, from:user, date range). Also: read channel/thread history, post messages. No Slack app install needed — xoxc user session via SSO.
 env_vars:
-  - SLACK_XOXC
-  - SLACK_D_COOKIE
   - SLACK_WORKSPACE_URL
 sniffer:
-  profile: ~/.browser_automation/slack_profile
+  profile: ~/.browser_automation/profile
   url: ${SLACK_WORKSPACE_URL}
   filter: /api/
 ---
 
 # Slack
 
-Access is via your own user session extracted after SSO into a persistent browser profile (`~/.browser_automation/slack_profile/`) — no Slack app installation or admin approval needed.
+Access is via the **shared** browser profile (`~/.browser_automation/profile/`) — log in once via company SSO and every browser-session tool reuses it. No Slack app installation or admin approval needed.
 
-Env: `SLACK_WORKSPACE_URL`, `SLACK_XOXC`, `SLACK_D_COOKIE` (written by `sso.py`; refresh via `python3 shared_utils/playwright_sso.py --slack-only` when the session stops working)
+Env: `SLACK_WORKSPACE_URL` only (instance URL — not a secret). Auth tokens stay in the browser profile. Refresh via `python3 shared_utils/playwright_sso.py --slack-only` when the session stops working.
 
-**API calls:** use `shared_utils/session_request.py` — it reuses the saved browser profile and extracts `xoxc` + `d` automatically. Do not call `urllib` or `curl` directly for Slack.
+**API calls:** use `shared_utils/session_request.py` — it reuses the saved browser profile. Do not call `urllib`, `curl`, or read tokens from `.env`.
 
 Multiple Slack workspaces are supported with account-scoped env keys:
 `SLACK_ACME_WORKSPACE_URL`, `SLACK_ACME_XOXC`, `SLACK_ACME_D_COOKIE`
@@ -48,7 +46,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --slack-only
 ```
 
-The script opens Chromium, completes SSO, and writes `SLACK_XOXC` and `SLACK_D_COOKIE` to `.env` automatically.
+The script opens Chromium, completes SSO, and saves the session in `~/.browser_automation/profile/`. Nothing auth-related is written to `.env`.
 
 For a second workspace, set a scoped URL and refresh with `--account`:
 
@@ -60,8 +58,17 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --slack-only --account acme
 ```
 
-The account name becomes an uppercase prefix, so this writes
-`SLACK_ACME_XOXC` and `SLACK_ACME_D_COOKIE`.
+The account name becomes an uppercase prefix in `.env` keys and a separate profile:
+
+```bash
+# .env
+SLACK_ACME_WORKSPACE_URL=https://acme.slack.com/
+
+source .venv/bin/activate
+python3 shared_utils/playwright_sso.py --slack-only --account acme
+```
+
+That uses the same shared profile with `SLACK_ACME_WORKSPACE_URL` in `.env` to target the acme workspace.
 
 ## Verified multi-workspace flow
 

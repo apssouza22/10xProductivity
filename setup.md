@@ -96,7 +96,7 @@ For each tool the user selected, follow this routing in order — stop at the fi
 
 **Validation is mandatory on all paths.** Run the verify snippet and confirm it returns expected output before marking a tool as done.
 
-**SSO tools need bootstrapping first.** For tools that use browser session auth (Slack, Grafana, Google Drive, etc.), credentials are written to `TENX_PRIVATE_DIR/.env` by `playwright_sso.py` and API calls use `shared_utils/session_request.py` against the persistent profile in `~/.browser_automation/`. The verify snippet will fail until you run the SSO script at least once. Check the tool's `setup.md` for the exact command (usually `source .venv/bin/activate && python3 shared_utils/playwright_sso.py --tool-only`).
+**SSO tools need bootstrapping first.** All browser-session tools share one Chromium profile at `~/.browser_automation/profile/`. Log in once via company SSO — Slack, Grafana, LinkedIn, and every other connected tool reuse that session. Auth never goes in `.env`; only instance URLs (e.g. `SLACK_WORKSPACE_URL`, `GRAFANA_BASE_URL`) do. Run `playwright_sso.py` at least once per tool (or once total if the first login covers your IdP). API calls use `shared_utils/session_request.py`.
 
 ---
 
@@ -131,7 +131,7 @@ Note: {any critical gotcha that would cause silent failure}  ← omit if none
 
 **Rules for each field:**
 - **Instance** — the real URL the verify snippet hit (e.g. `https://jira.company.example`, not `https://jira.yourcompany.com`). Include prod vs dev if both exist.
-- **Auth** — the method that actually passed verification. For tools with Cloud vs Server/DC variants (Jira, Confluence), name the variant explicitly. Never list both — only the one in use.
+- **Auth** — the method that actually passed verification. For browser-session tools, cite `~/.browser_automation/profile/` (shared across all tools). For API-token tools, name the header format; for Cloud vs Server/DC variants (Jira, Confluence), name the variant explicitly. Never list session tokens in verified_connections.
 - **Active env** — only vars that are populated with real values. If a var is present in `TENX_PRIVATE_DIR/.env` but is a placeholder (e.g. `you@yourcompany.com`), omit it and add a Note explaining it should be ignored.
 - **Refresh** — include for any token with a lifetime under ~24h (SSO sessions, Coveo JWTs, xoxc). Omit for long-lived API tokens and PATs.
 - **Note** — include only if there is a silent failure risk: a placeholder var that must be ignored, a CLI that must be used instead of REST, a required prerequisite (VPN, `/etc/hosts`, Zscaler), or a common misidentification (e.g. PHX-XXXXX vs PHOENIX-XXXX).
@@ -210,22 +210,21 @@ Once written, the skill is active. Cursor and Claude Code will load `verified_co
 
 ## Step 5: Optional triggers and runtime
 
-After tool connections work, you can test local triggers and runtime. Start with Slack self-DM polling only after the Slack connection has verified `SLACK_XOXC` and `SLACK_D_COOKIE`.
+After tool connections work, you can test local triggers and runtime. Start with Slack self-DM polling only after the Slack browser profile is verified (`python3 shared_utils/playwright_sso.py --slack-only`).
 
 ```bash
 source .venv/bin/activate
 10x-host --trigger slack-polling --workflow workflows/assistant/assistant.md --engine cursor
 ```
 
-For Slack self-DM polling, add these to `TENX_PRIVATE_DIR/.env`:
+For Slack self-DM polling, add to `TENX_PRIVATE_DIR/.env`:
 
 ```text
-SLACK_XOXC=xoxc-...
-SLACK_D_COOKIE=...
+SLACK_WORKSPACE_URL=https://yourcompany.slack.com/
 TENX_AGENT_ENGINE=cursor
 ```
 
-This path does not require a personal Slack app, Socket Mode, webhook, or bot token.
+Slack auth uses the shared browser profile at `~/.browser_automation/profile/` (and `SLACK_WORKSPACE_URL` from `.env`).
 
 
 ## Contributing fixes upstream

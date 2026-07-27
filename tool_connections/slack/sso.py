@@ -1,8 +1,9 @@
 """
 Slack SSO capture — plugin for playwright_sso.py discovery.
 
-Navigates to your Slack workspace, completes Okta/SSO login, and extracts
-the xoxc client token + d cookie from localStorage and browser cookies.
+Opens the Slack workspace in the shared browser profile. Auth (xoxc token,
+d cookie, localStorage) stays in ~/.browser_automation/profile/ — not
+in .env. Only SLACK_WORKSPACE_URL belongs in .env.
 
 Standalone usage:
     python3 tool_connections/slack/sso.py
@@ -10,7 +11,6 @@ Standalone usage:
     python3 tool_connections/slack/sso.py --account acme --force
 """
 
-import json
 import os
 import re
 import sys
@@ -26,18 +26,17 @@ except ImportError:
     from playwright.sync_api import sync_playwright
 
 TOOL_NAME = "slack"
-ENV_KEYS = ["SLACK_XOXC", "SLACK_D_COOKIE"]
-ACCOUNT_ENV_KEYS = ["SLACK_WORKSPACE_URL"]
+CONFIG_ENV_KEYS = ["SLACK_WORKSPACE_URL"]
 
 
-def _profile_dir() -> Path:
+def _profile_dir(env: dict | None = None) -> Path:
     sys.path.insert(0, str(Path(__file__).parents[2]))
-    from shared_utils.browser import BROWSER_AUTOMATION_DIR
-    return BROWSER_AUTOMATION_DIR / "slack_profile"
+    from shared_utils.browser import SHARED_BROWSER_PROFILE
+    return SHARED_BROWSER_PROFILE
 
 
 def check(env: dict) -> bool:
-    """Return True if the selected Slack browser session is valid."""
+    """Return True if the Slack browser profile has a valid session."""
     workspace_url = _normalize_workspace_url(env.get("SLACK_WORKSPACE_URL", ""))
     if not workspace_url or "yourcompany" in workspace_url:
         return False
@@ -49,6 +48,7 @@ def check(env: dict) -> bool:
             "slack",
             "GET",
             "https://slack.com/api/auth.test",
+            profile_dir=_profile_dir(env),
             warmup_url=workspace_url,
         )
         data = result.get("json") or {}
@@ -73,15 +73,9 @@ def _account_prefix(account: str) -> str:
     return prefix
 
 
-def _account_env_key(account: str, key: str) -> str:
-    """Backward-compatible account-first key, e.g. ACME_SLACK_XOXC."""
-    return f"{_account_prefix(account)}_{key}"
-
-
 def _scoped_env_key(account: str, key: str) -> str:
-    """Tool-first account key, e.g. SLACK_ACME_XOXC."""
     if "_" not in key:
-        return _account_env_key(account, key)
+        return f"{_account_prefix(account)}_{key}"
     namespace, suffix = key.split("_", 1)
     return f"{namespace}_{_account_prefix(account)}_{suffix}"
 
@@ -90,9 +84,9 @@ def _env_for_account(env: dict, account: str | None) -> dict:
     if not account:
         return dict(env)
     scoped = dict(env)
-    for key in ACCOUNT_ENV_KEYS + ENV_KEYS:
+    for key in CONFIG_ENV_KEYS:
         scoped_key = _scoped_env_key(account, key)
-        legacy_key = _account_env_key(account, key)
+        legacy_key = f"{_account_prefix(account)}_{key}"
         if scoped_key in env:
             scoped[key] = env[scoped_key]
         elif legacy_key in env:
@@ -104,24 +98,75 @@ def _env_for_account(env: dict, account: str | None) -> dict:
     return scoped
 
 
-def _tokens_for_account(tokens: dict, account: str | None) -> dict:
-    if not account:
-        return tokens
-    return {_scoped_env_key(account, key): value for key, value in tokens.items()}
+def _wait_for_slack_login(page, workspace_url: str) -> None:
+    deadline = time.time() + 180
+    next_heartbeat = time.time() + 15
+    while time.time() < deadline:
+        time.sleep(2)
+        if time.time() >= next_heartbeat:
+            remaining = max(0, int(deadline - time.time()))
+            print(f"    Still waiting... ({remaining}s remaining — Ctrl+C to abort)", flush=True)
+            next_heartbeat = time.time() + 15
+        try:
+            xoxc = page.evaluate("""(workspaceUrl) => {
+                const requestedHost = new URL(workspaceUrl).hostname.toLowerCase();
+                const requestedDomain = requestedHost.split('.')[0];
+
+                function tokenFromTeam(team) {
+                    if (!team || typeof team !== 'object') return null;
+                    const token = team.token || team.xoxc || team.client_token;
+                    if (!token || !token.startsWith('xoxc')) return null;
+                    const markers = [
+                        team.domain, team.url, team.team_url, team.teamUrl,
+                        team.name, team.team_name, team.enterprise_url,
+                    ].filter(Boolean).map(String).join(' ').toLowerCase();
+                    if (markers.includes(requestedHost) || markers.includes(requestedDomain)) {
+                        return token;
+                    }
+                    return null;
+                }
+
+                try {
+                    const cfg = JSON.parse(localStorage.getItem('localConfig_v2') || 'null');
+                    if (cfg && cfg.teams) {
+                        for (const team of Object.values(cfg.teams)) {
+                            const token = tokenFromTeam(team);
+                            if (token) return token;
+                        }
+                        const tokens = Object.values(cfg.teams)
+                            .map(team => team && team.token)
+                            .filter(token => token && token.startsWith('xoxc'));
+                        if (tokens.length === 1) return tokens[0];
+                    }
+                } catch(e) {}
+                return null;
+            }""", workspace_url)
+        except Exception:
+            continue
+        if xoxc:
+            print("    Login detected!", flush=True)
+            return
+    raise RuntimeError(
+        "No xoxc token found for the requested workspace — login may not "
+        "have completed, or multiple teams are present and none matched "
+        f"{workspace_url}."
+    )
 
 
 def capture(env: dict) -> dict:
-    """Open Slack workspace in a persistent profile, extract xoxc + d cookie."""
+    """Open Slack workspace in a persistent profile until login succeeds."""
     workspace_url = _normalize_workspace_url(env.get("SLACK_WORKSPACE_URL", ""))
     if not workspace_url or "yourcompany" in workspace_url:
-        prefix = env.get("SSO_ACCOUNT_PREFIX", "")
-        workspace_key = f"{prefix}_SLACK_WORKSPACE_URL" if prefix else "SLACK_WORKSPACE_URL"
+        account = env.get("SSO_ACCOUNT")
+        workspace_key = (
+            _scoped_env_key(account, "SLACK_WORKSPACE_URL") if account else "SLACK_WORKSPACE_URL"
+        )
         raise RuntimeError(
             f"{workspace_key} not set in .env. "
             f"Add {workspace_key}=https://yourcompany.slack.com/ and retry."
         )
 
-    profile = _profile_dir()
+    profile = _profile_dir(env)
     profile.mkdir(parents=True, exist_ok=True)
     print(f"  Opening Slack ({workspace_url}) — SSO should auto-complete...")
     print(f"  Profile: {profile}")
@@ -135,129 +180,33 @@ def capture(env: dict) -> dict:
             args=["--window-size=900,600", "--window-position=100,100"],
         )
         page = ctx.new_page()
-
         page.goto(workspace_url, wait_until="commit", timeout=30_000)
         print("    Waiting for Slack login to complete (up to 3 min — Ctrl+C to abort)...", flush=True)
-
-        xoxc = None
-        deadline = time.time() + 180
-        next_heartbeat = time.time() + 15
         try:
-            while time.time() < deadline:
-                time.sleep(2)
-                if time.time() >= next_heartbeat:
-                    remaining = max(0, int(deadline - time.time()))
-                    print(f"    Still waiting... ({remaining}s remaining — Ctrl+C to abort)", flush=True)
-                    next_heartbeat = time.time() + 15
-                try:
-                    xoxc = page.evaluate("""(workspaceUrl) => {
-                        const requestedHost = new URL(workspaceUrl).hostname.toLowerCase();
-                        const requestedDomain = requestedHost.split('.')[0];
-
-                        function tokenFromTeam(team) {
-                            if (!team || typeof team !== 'object') return null;
-                            const token = team.token || team.xoxc || team.client_token;
-                            if (!token || !token.startsWith('xoxc')) return null;
-                            const markers = [
-                                team.domain,
-                                team.url,
-                                team.team_url,
-                                team.teamUrl,
-                                team.name,
-                                team.team_name,
-                                team.enterprise_url,
-                            ].filter(Boolean).map(String).join(' ').toLowerCase();
-                            if (markers.includes(requestedHost) || markers.includes(requestedDomain)) {
-                                return token;
-                            }
-                            return null;
-                        }
-
-                        try {
-                            const cfg = JSON.parse(localStorage.getItem('localConfig_v2') || 'null');
-                            if (cfg && cfg.teams) {
-                                for (const team of Object.values(cfg.teams)) {
-                                    const token = tokenFromTeam(team);
-                                    if (token) return token;
-                                }
-
-                                const tokens = Object.values(cfg.teams)
-                                    .map(team => team && team.token)
-                                    .filter(token => token && token.startsWith('xoxc'));
-                                if (tokens.length === 1) return tokens[0];
-                            }
-                        } catch(e) {}
-                        return null;
-                    }""", workspace_url)
-                except Exception:
-                    continue
-                if xoxc:
-                    print("    Login detected!", flush=True)
-                    break
+            _wait_for_slack_login(page, workspace_url)
         except KeyboardInterrupt:
             ctx.close()
             raise RuntimeError("Aborted by user — Slack login did not complete.")
-
-        if not xoxc:
-            raise RuntimeError(
-                "No xoxc token found for the requested workspace — login may not "
-                "have completed, or multiple teams are present and none matched "
-                f"{workspace_url}."
-            )
-
-        all_cookies = ctx.cookies(["https://slack.com", "https://app.slack.com", workspace_url])
-        d_cookie = {c["name"]: c["value"] for c in all_cookies}.get("d", "")
-        if not d_cookie:
-            raise RuntimeError("No 'd' cookie found after Slack SSO.")
-
         ctx.close()
 
-    print(f"    Slack xoxc captured ({len(xoxc)} chars)")
-    return {"SLACK_XOXC": xoxc, "SLACK_D_COOKIE": d_cookie}
+    print("    Slack session saved in browser profile.")
+    return {}
 
 
 if __name__ == "__main__":
     import argparse
-    from pathlib import Path
 
     sys.path.insert(0, str(Path(__file__).parents[2]))
     from shared_utils.browser import DEFAULT_ENV_FILE
-
-    ENV_FILE = DEFAULT_ENV_FILE
-
-    def _clean_env_value(value: str) -> str:
-        value = value.strip()
-        if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
-            return value[1:-1]
-        return value
-
-    def _load_env():
-        if not ENV_FILE.exists():
-            return {}
-        return {k.strip(): _clean_env_value(v) for line in ENV_FILE.read_text().splitlines()
-                if "=" in line and not line.startswith("#") for k, v in [line.split("=", 1)]}
-
-    def _write_env(tokens):
-        import re
-        ENV_FILE.parent.mkdir(parents=True, exist_ok=True)
-        content = ENV_FILE.read_text() if ENV_FILE.exists() else ""
-        for key, value in tokens.items():
-            new_line = f"{key}={value}"
-            if re.search(rf"^{re.escape(key)}=", content, flags=re.MULTILINE):
-                content = re.sub(rf"^{re.escape(key)}=.*$", new_line, content, flags=re.MULTILINE)
-            elif "# --- Slack" in content:
-                content = content.replace("# --- Slack\n", f"# --- Slack\n{new_line}\n", 1)
-            else:
-                content += f"\n# --- Slack\n{new_line}\n"
-        ENV_FILE.write_text(content)
+    from shared_utils.playwright_sso import load_env, write_env
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--force", action="store_true")
-    parser.add_argument("--account", help="Account/workspace name for scoped .env keys, e.g. SLACK_ACME_XOXC")
+    parser.add_argument("--account", help="Account name for scoped SLACK_*_WORKSPACE_URL in .env")
     parser.add_argument("--workspace-url", help="Override SLACK_WORKSPACE_URL from .env")
     args = parser.parse_args()
 
-    env = _load_env()
+    env = load_env(DEFAULT_ENV_FILE)
     workspace_override = {}
     if args.workspace_url:
         key = _scoped_env_key(args.account, "SLACK_WORKSPACE_URL") if args.account else "SLACK_WORKSPACE_URL"
@@ -265,12 +214,13 @@ if __name__ == "__main__":
         env[key] = workspace_override[key]
 
     plugin_env = _env_for_account(env, args.account)
+    profile = _profile_dir(plugin_env)
+
     if not args.force and check(plugin_env):
-        key = _scoped_env_key(args.account, "SLACK_XOXC") if args.account else "SLACK_XOXC"
-        print(f"{key}: ok — nothing to do. Use --force to refresh.")
+        print(f"Slack session ok ({profile}) — nothing to do. Use --force to refresh.")
         sys.exit(0)
 
-    raw = capture(plugin_env)
-    tokens = {**workspace_override, **_tokens_for_account(raw, args.account)}
-    _write_env(tokens)
-    print(f"  Written to {ENV_FILE}")
+    capture(plugin_env)
+    if workspace_override:
+        write_env(workspace_override, DEFAULT_ENV_FILE)
+    print(f"  Session profile: {profile}")

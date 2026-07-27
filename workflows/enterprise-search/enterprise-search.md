@@ -260,4 +260,4 @@ After all searches complete, give the user **one direct answer** — not a tool-
 - **Notion searches titles only.** Body text is not indexed by the API. A "no results" from Notion doesn't mean the knowledge isn't there — it may just not be in the page title.
 - **GitHub is expensive for non-code queries.** Skip it unless the query is clearly code-related; it adds noise and burns API rate limits.
 - **Confluence vs. Jira overlap:** Confluence has the narrative ("how it works"), Jira has the status ("is it done"). Both are worth searching for most topics.
-- **Credentials:** API-token tools load from `.env` in Python. Browser-session tools (Slack, Grafana, LinkedIn) use `shared_utils/session_request.py` with the persistent profile in `~/.browser_automation/` — do not read `SLACK_XOXC` or session cookies from `.env` for API calls.
+- **Credentials:** API-token tools load secrets from `.env`. Browser-session tools share auth in `~/.browser_automation/profile/` — one company SSO login covers all of them. Use `session_request.py` for API calls.

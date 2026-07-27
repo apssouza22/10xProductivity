@@ -33,7 +33,7 @@ Workflow:
 
   Example frontmatter:
     sniffer:
-      profile: ~/.browser_automation/linkedin_profile
+      profile: ~/.browser_automation/profile
       url: https://www.linkedin.com/feed/
       filter: /voyager/api
 
@@ -44,7 +44,7 @@ Usage:
 
     # Explicit — full control:
     python3 shared_utils/traffic_sniffer.py \\
-        --profile ~/.browser_automation/linkedin_profile \\
+        --profile ~/.browser_automation/profile \\
         --url https://www.linkedin.com/feed/ \\
         --filter /voyager/api \\
         --output /tmp/linkedin_traffic.jsonl
@@ -67,7 +67,7 @@ Usage (as a library):
     from shared_utils.traffic_sniffer import sniff
 
     sniff(
-        profile_dir=Path.home() / ".browser_automation" / "linkedin_profile",
+        profile_dir=Path.home() / ".browser_automation" / "profile",
         start_url="https://www.linkedin.com/feed/",
         filters=["/voyager/api"],
         output_path=Path("/tmp/linkedin_traffic.jsonl"),

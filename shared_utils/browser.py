@@ -32,6 +32,7 @@ __all__ = [
     "http_get", "http_get_no_redirect",
     "make_ssl_ctx", "urlopen",
     "DEFAULT_ENV_FILE", "TENX_PRIVATE_DIR", "private_path", "BROWSER_AUTOMATION_DIR",
+    "SHARED_BROWSER_PROFILE", "profile_dir_for",
 ]
 
 TENX_PRIVATE_DIR = Path(
@@ -48,7 +49,17 @@ DEFAULT_ENV_FILE = private_path(".env")
 # Shared home for all persistent browser profiles and auth snapshots.
 # Lives outside the repo (~/.browser_automation/) so sessions survive
 # repo re-clones and are never accidentally committed.
+# Auth tokens and cookies stay in the profile — never copy them to .env.
 BROWSER_AUTOMATION_DIR = Path.home() / ".browser_automation"
+
+# One Chromium profile for every browser-session tool. Log in once (company SSO)
+# and Slack, Grafana, LinkedIn, etc. all reuse the same cookies and storage.
+SHARED_BROWSER_PROFILE = BROWSER_AUTOMATION_DIR / "profile"
+
+
+def profile_dir_for(tool: str | None = None, account: str | None = None) -> Path:
+    """Return the shared browser profile (tool/account args kept for API compatibility)."""
+    return SHARED_BROWSER_PROFILE
 
 
 def load_env_var(key: str, default: str = "") -> str:

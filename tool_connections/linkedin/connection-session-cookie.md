@@ -1,23 +1,21 @@
 ---
 name: linkedin
 auth: session-cookie
-description: LinkedIn — personal use via browser session cookie. Read/send messages, create posts, look up your own profile. Uses Voyager API (internal) via Playwright persistent browser profile — no developer app required. Use when reading LinkedIn messages, replying to conversations, creating posts, or fetching your own profile.
-env_vars:
-  - LINKEDIN_LI_AT
-  - LINKEDIN_JSESSIONID
+description: LinkedIn — personal use via browser session. Read/send messages, create posts, look up your own profile. Uses Voyager API (internal) via Playwright persistent browser profile — no developer app required.
+env_vars: []
 sniffer:
-  profile: ~/.browser_automation/linkedin_profile
+  profile: ~/.browser_automation/profile
   url: https://www.linkedin.com/feed/
   filter: /voyager/api
 ---
 
-# LinkedIn — session cookie (li_at)
+# LinkedIn — browser session
 
-LinkedIn for personal use: read messages, reply, make posts, look up your own profile. No developer app required. Uses the `li_at` session cookie extracted from a logged-in browser via Playwright.
+LinkedIn for personal use: read messages, reply, make posts, look up your own profile. No developer app required. Session cookies (`li_at`, `JSESSIONID`) live in `~/.browser_automation/profile/` — not in `.env`.
 
 API: Voyager (internal) — `https://www.linkedin.com/voyager/api/`
 
-**Verified:** Production (www.linkedin.com) — `/me`, messaging conversations, send message, post creation — 2026-03. No VPN required. Works with any LinkedIn personal account.
+**Verified:** Production (www.linkedin.com) — `/me`, messaging conversations, send message, post creation — 2026-03.
 
 ---
 
@@ -26,9 +24,9 @@ API: Voyager (internal) — `https://www.linkedin.com/voyager/api/`
 Setup: `tool_connections/linkedin/setup.md`
 
 ```bash
-# .env entries (set automatically by sso.py):
-LINKEDIN_LI_AT=your-li_at-cookie-value          # long-lived (weeks/months)
-LINKEDIN_JSESSIONID=your-jsessionid-value        # CSRF token (~24h, re-captured with sso.py)
+# No auth entries in .env — session is in the browser profile:
+#   ~/.browser_automation/profile/
+# Refresh: python3 tool_connections/linkedin/sso.py
 ```
 
 ---
@@ -37,7 +35,7 @@ LINKEDIN_JSESSIONID=your-jsessionid-value        # CSRF token (~24h, re-captured
 
 All Voyager API calls go through `shared_utils/session_request.py` (`tool_request("linkedin", ...)`) — it reuses the persistent profile and sets the CSRF token from the `JSESSIONID` cookie automatically. Raw `urllib` or `curl` calls are blocked by LinkedIn bot detection.
 
-**Important:** Always use the persistent profile (`~/.browser_automation/linkedin_profile/`) so LinkedIn doesn't trigger 2FA on every run.
+**Important:** Always use the persistent profile (`~/.browser_automation/profile/`) so LinkedIn doesn't trigger 2FA on every run.
 
 ```python
 from shared_utils.session_request import tool_request
@@ -224,7 +222,7 @@ with sync_playwright() as p:
 
 ## Notes
 
-- **Persistent profile required:** `~/.browser_automation/linkedin_profile/` — never delete this folder or LinkedIn will 2FA again on next run.
+- **Persistent profile required:** `~/.browser_automation/profile/` — never delete this folder or LinkedIn will 2FA again on next run.
 - **JSESSIONID expires in ~24h.** Re-run `sso.py` to refresh (no 2FA since profile is trusted).
 - **li_at is long-lived** (weeks to months). If it expires, re-run `sso.py --force`.
 - **No VPN required.**

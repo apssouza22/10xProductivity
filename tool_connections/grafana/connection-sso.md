@@ -4,24 +4,22 @@ auth: sso-session
 description: Grafana dashboards — extract PromQL queries from panels, look up dashboard UIDs, query data. Use when you need the PromQL from a Grafana dashboard (e.g. for incident analysis), or want to find which dashboards exist for a service.
 env_vars:
   - GRAFANA_BASE_URL
-  - GRAFANA_SESSION
 sniffer:
-  profile: ~/.browser_automation/grafana_profile
+  profile: ~/.browser_automation/profile
   url: ${GRAFANA_BASE_URL}
   filter: /api/
 ---
 
 # Grafana
 
-Env: `GRAFANA_BASE_URL`, `GRAFANA_SESSION`
+Env: `GRAFANA_BASE_URL` only (instance URL). Session cookie lives in `~/.browser_automation/profile/`.
 
 ```bash
 # Set in .env:
 # GRAFANA_BASE_URL=https://grafana.yourcompany.com
-# GRAFANA_SESSION=your-grafana-session-cookie-value   (~8h, refresh with playwright_sso.py)
 ```
 
-Auth: session cookie captured via SSO into a persistent browser profile (`~/.browser_automation/grafana_profile/`) — refresh with `python3 shared_utils/playwright_sso.py --grafana-only`.
+Auth: session cookie in browser profile — refresh with `python3 shared_utils/playwright_sso.py --grafana-only`.
 
 **API calls:** use `shared_utils/session_request.py` — it reuses the saved browser profile and attaches session cookies automatically.
 
@@ -49,7 +47,7 @@ print(result.get("json"))
 ## Refresh session
 
 ```bash
-# Refreshes GRAFANA_SESSION — opens browser for SSO, ~20–30 s
+# Refreshes the browser profile — opens browser for SSO, ~20–30 s
 source .venv/bin/activate
 python3 shared_utils/playwright_sso.py
 ```

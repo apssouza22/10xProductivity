@@ -164,7 +164,7 @@ python3 workflows/discover-ui-surface/assets/observe_session.py \
 
 **Session reuse (LinkedIn / sites with login):**
 
-**10xProductivity LinkedIn (recommended)** — the `linkedin_automation` blocks use a persistent Chromium profile at `~/.browser_automation/linkedin_profile` (same as `search_posts.py`). Reuse it so you are already logged in:
+**10xProductivity (recommended)** — browser-session tools share one Chromium profile at `~/.browser_automation/profile`. Reuse it so you are already logged in:
 
 ```bash
 python3 workflows/discover-ui-surface/assets/observe_session.py \

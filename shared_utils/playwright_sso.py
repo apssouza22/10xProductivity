@@ -3,22 +3,17 @@
 SSO session refresher — discovery orchestrator.
 
 Discovers all tool_connections/*/sso.py plugins and delegates to them.
-Each plugin exposes: TOOL_NAME, ENV_KEYS, check(env) -> bool, capture(env) -> dict.
-Plugins can also expose ACCOUNT_ENV_KEYS for account-specific config values
-such as workspace URLs.
-
-Adding a new tool never requires changes to this file — just create
-tool_connections/<tool>/sso.py with the standard interface.
+Each plugin exposes: TOOL_NAME, check(env) -> bool, capture(env) -> dict.
+Optional CONFIG_ENV_KEYS lists non-secret config vars that may be written to
+.env (instance URLs, workspace URLs). Auth tokens and cookies stay in the
+shared browser profile at ~/.browser_automation/profile/ — never in .env.
+Log in once via company SSO; every tool reuses that session.
 
 Usage:
-    python3 playwright_sso.py                  # refresh all expired tokens
+    python3 playwright_sso.py                  # refresh all expired sessions
     python3 playwright_sso.py --force          # refresh all regardless
     python3 playwright_sso.py --slack-only     # refresh Slack only
     python3 playwright_sso.py --grafana-only   # refresh Grafana only
-    python3 playwright_sso.py --gdrive-only    # refresh Google Drive only
-    python3 playwright_sso.py --teams-only     # refresh Microsoft Teams only
-    python3 playwright_sso.py --outlook-only   # refresh Outlook only
-    python3 playwright_sso.py --outlook-only --login-hint user@example.com
     python3 playwright_sso.py --slack-only --account acme
     python3 playwright_sso.py --list           # list discovered plugins
 """
@@ -30,17 +25,17 @@ import sys
 from pathlib import Path
 
 try:
-    from browser import DEFAULT_ENV_FILE
+    from browser import DEFAULT_ENV_FILE, profile_dir_for, BROWSER_AUTOMATION_DIR, SHARED_BROWSER_PROFILE
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
-    from browser import DEFAULT_ENV_FILE
+    from browser import DEFAULT_ENV_FILE, profile_dir_for, BROWSER_AUTOMATION_DIR, SHARED_BROWSER_PROFILE
 
 ENV_FILE = DEFAULT_ENV_FILE
 TOOL_CONNECTIONS_DIR = Path(__file__).parents[1] / "tool_connections"
 
 
 # ---------------------------------------------------------------------------
-# .env helpers
+# .env helpers — config only; never store session tokens here
 # ---------------------------------------------------------------------------
 
 def clean_env_value(value: str) -> str:
@@ -58,6 +53,8 @@ def load_env(env_path: Path = ENV_FILE) -> dict[str, str]:
 
 
 def write_env(tokens: dict[str, str], env_path: Path = ENV_FILE) -> None:
+    if not tokens:
+        return
     env_path.parent.mkdir(parents=True, exist_ok=True)
     content = env_path.read_text() if env_path.exists() else ""
     for key, value in tokens.items():
@@ -79,34 +76,32 @@ def account_prefix(account: str) -> str:
 
 
 def account_env_key(account: str, key: str) -> str:
-    """Backward-compatible account-first key, e.g. ACME_SLACK_XOXC."""
     return f"{account_prefix(account)}_{key}"
 
 
 def scoped_env_key(account: str, key: str) -> str:
-    """Tool-first account key, e.g. SLACK_ACME_XOXC.
-
-    Most connection env vars already start with the tool namespace. Keeping that
-    namespace first groups all credentials for a tool together while inserting
-    the account/workspace name before the credential-specific suffix.
-    """
     if "_" not in key:
         return account_env_key(account, key)
     namespace, suffix = key.split("_", 1)
     return f"{namespace}_{account_prefix(account)}_{suffix}"
 
 
-def account_keys(mod: object) -> list[str]:
-    return list(getattr(mod, "ACCOUNT_ENV_KEYS", [])) + list(getattr(mod, "ENV_KEYS", []))
+def config_keys(mod: object) -> list[str]:
+    return list(getattr(mod, "CONFIG_ENV_KEYS", []))
+
+
+def filter_config_tokens(mod: object, tokens: dict[str, str]) -> dict[str, str]:
+    allowed = set(config_keys(mod))
+    return {k: v for k, v in tokens.items() if k in allowed}
 
 
 def env_for_account(env: dict[str, str], mod: object, account: str | None) -> dict[str, str]:
-    """Overlay account-scoped values onto the plugin's normal env key names."""
+    """Overlay account-scoped config values onto the plugin's normal env key names."""
     if not account:
         return dict(env)
 
     scoped_env = dict(env)
-    for key in account_keys(mod):
+    for key in config_keys(mod):
         scoped_key = scoped_env_key(account, key)
         legacy_key = account_env_key(account, key)
         if scoped_key in env:
@@ -126,15 +121,15 @@ def tokens_for_account(tokens: dict[str, str], account: str | None) -> dict[str,
     return {scoped_env_key(account, key): value for key, value in tokens.items()}
 
 
+def profile_for_plugin(mod: object, account: str | None) -> Path:
+    return SHARED_BROWSER_PROFILE
+
+
 # ---------------------------------------------------------------------------
 # Plugin discovery
 # ---------------------------------------------------------------------------
 
 def discover_plugins() -> dict[str, object]:
-    """
-    Scan tool_connections/*/sso.py and load each as a plugin module.
-    Returns {tool_name: module} for every plugin with a valid interface.
-    """
     plugins = {}
     for sso_path in sorted(TOOL_CONNECTIONS_DIR.glob("*/sso.py")):
         spec = importlib.util.spec_from_file_location(
@@ -162,24 +157,20 @@ def main():
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument("--env-file", type=Path, default=ENV_FILE, metavar="PATH")
-    parser.add_argument("--force", action="store_true", help="Refresh even if tokens are valid")
+    parser.add_argument("--force", action="store_true", help="Refresh even if session is valid")
     parser.add_argument("--list", action="store_true", help="List discovered plugins and exit")
     parser.add_argument(
         "--account",
         metavar="NAME",
         help=(
-            "Refresh an account-scoped credential set. For example, "
-            "--slack-only --account acme reads SLACK_ACME_WORKSPACE_URL and "
-            "writes SLACK_ACME_XOXC / SLACK_ACME_D_COOKIE."
+            "Account-scoped config (e.g. SLACK_ACME_WORKSPACE_URL in .env). "
+            "All accounts share the same browser profile at ~/.browser_automation/profile/."
         ),
     )
     parser.add_argument(
         "--login-hint",
         metavar="EMAIL",
-        help=(
-            "Optional account/email hint for SSO plugins that support it, "
-            "for example Outlook. Overrides *_LOGIN_HINT values from .env."
-        ),
+        help="Optional account/email hint for SSO plugins that support it.",
     )
 
     for name in plugins:
@@ -189,17 +180,16 @@ def main():
     args = parser.parse_args()
 
     if args.list:
-        print("Discovered SSO plugins:")
+        print("Discovered SSO plugins (shared profile: ~/.browser_automation/profile/):")
         for name, mod in plugins.items():
-            keys = getattr(mod, "ENV_KEYS", [])
-            print(f"  {name:20s} → {', '.join(keys)}")
+            cfg = ", ".join(config_keys(mod)) or "(no .env config — profile only)"
+            print(f"  {name:20s}  .env: {cfg}")
         return
 
     env = load_env(args.env_file)
     if args.login_hint:
         env["SSO_LOGIN_HINT"] = args.login_hint
 
-    # Determine which tools to run
     only_flags = {name: getattr(args, f"{name}_only", False) for name in plugins}
     any_only = any(only_flags.values())
     if args.account and sum(1 for selected in only_flags.values() if selected) != 1:
@@ -208,27 +198,33 @@ def main():
     targets = {name: mod for name, mod in plugins.items()
                if not any_only or only_flags.get(name)}
 
-    print("SSO token refresher")
-    print(f"  .env: {args.env_file}")
+    print("SSO session refresher")
+    print(f"  .env (config only): {args.env_file}")
+    print(f"  Shared auth profile: {SHARED_BROWSER_PROFILE}")
     print()
 
     for name, mod in targets.items():
         plugin_env = env_for_account(env, mod, args.account)
         label = f"{name}:{args.account}" if args.account else name
+        profile = profile_for_plugin(mod, args.account)
+
         if not args.force:
             valid = mod.check(plugin_env)
             status = "ok" if valid else "expired or missing"
-            print(f"  {label}: {status}")
+            print(f"  {label}: {status}  ({profile})")
             if valid:
                 continue
 
-        print(f"  Refreshing {label}...")
+        print(f"  Refreshing {label} → {profile}")
         try:
-            tokens = tokens_for_account(mod.capture(plugin_env), args.account)
-            write_env(tokens, args.env_file)
-            env.update(tokens)
-            for k in tokens:
-                print(f"    Updated {k}")
+            raw_tokens = tokens_for_account(mod.capture(plugin_env), args.account)
+            config_tokens = filter_config_tokens(mod, raw_tokens)
+            if config_tokens:
+                write_env(config_tokens, args.env_file)
+                env.update(config_tokens)
+                for k in config_tokens:
+                    print(f"    Updated .env: {k}")
+            print(f"    Session saved in browser profile: {profile}")
         except Exception as e:
             print(f"  ERROR refreshing {name}: {e}", file=sys.stderr)
 

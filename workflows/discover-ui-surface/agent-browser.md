@@ -224,7 +224,7 @@ read/write approval boundaries, and known limitations.
 - Connections use supported APIs where available.
 - Browser-only tools default to Agent Browser instead of one-off Playwright
   code.
-- Agents reuse existing `~/.browser_automation/*_cdp_profile` sessions before
+- Agents reuse the shared profile at `~/.browser_automation/profile/` before
   creating empty profiles.
 - Feed/list reads return compact structured candidates, not page dumps.
 - Custom browser scripts exist only for demonstrated repetitive or deterministic

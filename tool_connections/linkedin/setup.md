@@ -7,7 +7,7 @@ description: Set up LinkedIn connection using li_at session cookie. No developer
 
 ## Auth method: session-cookie (li_at)
 
-LinkedIn has no public API for personal use without app approval. This connection uses your browser session cookie (`li_at`) extracted via Playwright. A persistent browser profile is saved to `~/.browser_automation/linkedin_profile/` so LinkedIn recognizes the device — no 2FA after the first login.
+LinkedIn has no public API for personal use without app approval. This connection uses your browser session cookie (`li_at`) extracted via Playwright. A persistent browser profile is saved to `~/.browser_automation/profile/` so LinkedIn recognizes the device — no 2FA after the first login.
 
 **What to ask the user:** Nothing. Just run `sso.py` — it opens a browser window for login.
 
@@ -23,25 +23,24 @@ python3 personal/linkedin/sso.py   # run from personal/ copy (see setup.md Step 
 ```
 
 2. A Chromium window opens. Log in to LinkedIn (complete 2FA if prompted — this is the only time).
-3. Once the feed loads, the script captures `LINKEDIN_LI_AT` and `LINKEDIN_JSESSIONID` and writes them to `.env` automatically.
+3. Once the feed loads, the session is saved in `~/.browser_automation/profile/`.
 4. The browser window closes.
 
-**Second run and beyond:** the script reuses `~/.browser_automation/linkedin_profile/` and skips straight to feed — no login, no 2FA.
+**Second run and beyond:** the script reuses `~/.browser_automation/profile/` and skips straight to feed — no login, no 2FA.
 
 ---
 
 ## Refresh
 
-- `LINKEDIN_JSESSIONID` expires in ~24h. Re-run `sso.py` to refresh (no 2FA, takes ~6s).
-- `LINKEDIN_LI_AT` is long-lived (weeks to months). Re-run `sso.py --force` if it expires.
+Re-run `sso.py` when the session expires (~24h for CSRF, weeks for `li_at`). No `.env` changes needed.
 
 ```bash
 # Check if session is still valid:
-python3 personal/linkedin/sso.py
-# → LINKEDIN_LI_AT is valid — nothing to do.
+python3 tool_connections/linkedin/sso.py
+# → LinkedIn session ok — nothing to do.
 
 # Force refresh:
-python3 personal/linkedin/sso.py --force
+python3 tool_connections/linkedin/sso.py --force
 ```
 
 ---
@@ -63,11 +62,9 @@ print(result["status"], mini["firstName"], mini["lastName"])
 
 ## `.env` entries
 
+No auth variables. LinkedIn session lives entirely in the browser profile:
+
 ```bash
-# --- LinkedIn ---
-# Short-lived JSESSIONID (~24h) — refresh with: python3 personal/linkedin/sso.py
-# Long-lived li_at (weeks/months) — refresh with: python3 personal/linkedin/sso.py --force
-# Persistent profile at: ~/.browser_automation/linkedin_profile/ (do not delete)
-LINKEDIN_LI_AT=your-li_at-cookie-value
-LINKEDIN_JSESSIONID=your-jsessionid-value
+# Profile: ~/.browser_automation/profile/
+# Refresh: python3 tool_connections/linkedin/sso.py
 ```

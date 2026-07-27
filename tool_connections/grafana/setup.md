@@ -27,7 +27,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --grafana-only
 ```
 
-On managed machines with enterprise SSO it completes automatically (~20–30s). On personal machines, complete the Grafana login once through the browser. `GRAFANA_SESSION` is written to `.env` automatically.
+On managed machines with enterprise SSO it completes automatically (~20–30s). On personal machines, complete the Grafana login once through the browser. Session is saved to `~/.browser_automation/profile/`.
 
 ---
 
@@ -53,9 +53,9 @@ print(result.get("json"))
 
 ```bash
 # --- Grafana ---
-# Short-lived (~8h) — refresh with: python3 shared_utils/playwright_sso.py --grafana-only
+# Instance URL only — auth stays in ~/.browser_automation/profile/
+# Refresh session: python3 shared_utils/playwright_sso.py --grafana-only
 GRAFANA_BASE_URL=https://grafana.yourcompany.com
-GRAFANA_SESSION=your-grafana-session-cookie-value
 ```
 
 ---

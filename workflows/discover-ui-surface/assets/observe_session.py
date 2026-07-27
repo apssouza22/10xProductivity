@@ -21,7 +21,7 @@ Options:
                             Chromium user-data dir (launch_persistent_context).
                             Mutually exclusive with --load-state.
     --linkedin-10x-profile  Shorthand for 10xProductivity LinkedIn session:
-                            ~/.browser_automation/linkedin_profile
+                            ~/.browser_automation/profile
     --save-state PATH       After the session ends, save storage_state to
                             this path for future --load-state reuse
     --quit-after-load       Open browser, wait for page load, then stop
@@ -57,7 +57,7 @@ Examples:
         --filter-domain linkedin.com --duration 600 --out trace.json
 
     # Same persistent Chromium profile as 10xProductivity linkedin_automation
-    # (search_posts.py → ~/.browser_automation/linkedin_profile)
+    # (shared profile → ~/.browser_automation/profile)
     python3 observe_session.py --url https://www.linkedin.com/feed/ \
         --linkedin-10x-profile --filter-domain linkedin.com --duration 600
 
@@ -86,7 +86,7 @@ except ImportError:
 
 
 # Same path as 10xProductivity/workflows/linkedin_automation/search_posts.py
-LINKEDIN_10X_PROFILE_DIR = Path.home() / ".browser_automation" / "linkedin_profile"
+LINKEDIN_10X_PROFILE_DIR = Path.home() / ".browser_automation" / "profile"
 
 
 # ---------------------------------------------------------------------------

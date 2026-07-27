@@ -94,7 +94,8 @@ Before asking the user for anything:
 | ✗        | **OAuth requiring user to create their own app** | High — stop, do not use                          | N/A                                |
 
 
-**Browser session API calls:** when a tool uses browser session auth (`auth: sso-session` or `auth: session-cookie`), all HTTP calls must go through `shared_utils/session_request.py` — not raw `urllib`, `curl`, or `requests`. Add a `sniffer:` block to the connection frontmatter (profile + warmup URL) so `tool_request("tool-name", ...)` can reuse the saved profile. See `tool_connections/slack/connection-sso.md` for a working example.
+**Browser session API calls:** when a tool uses browser session auth (`auth: sso-session` or `auth: session-cookie`), all HTTP calls must go through `shared_utils/session_request.py` — not raw `urllib`, `curl`, or `requests`. 
+Auth tokens and cookies stay in the shared browser profile at `~/.browser_automation/profile/` — never in `.env`. One company SSO login covers every browser-session tool. Only non-secret config (instance URLs) belongs in `.env`. Add a `sniffer:` block to the connection frontmatter (profile + warmup URL) so `tool_request("tool-name", ...)` can reuse the saved profile.
 
 
 **Browser fallback rule:** when no suitable API is available, use Agent Browser
@@ -119,7 +120,7 @@ submit through a normal authenticated UI.
 
 **SSO-only tools:** If the tool uses enterprise SSO and has no API token path, the only option is browser session capture (Priority 1). This is fine — but do three things:
 
-1. Write a plugin-compliant `sso.py` in `TENX_PRIVATE_DIR/personal/{tool-name}/` (not `tool_connections/`) with `TOOL_NAME`, `check(env) -> bool`, and `capture(env) -> dict`. Run it directly: `python3 "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal/{tool-name}/sso.py"`. If you later contribute the recipe upstream (owner-add or contribute workflow), `sso.py` is copied to `tool_connections/` as part of that process — not before.
+1. Write a plugin-compliant `sso.py` in `TENX_PRIVATE_DIR/personal/{tool-name}/` (not `tool_connections/`) with `TOOL_NAME`, `check(env) -> bool`, and `capture(env) -> dict`. `capture()` ensures the user is logged in via the shared profile at `~/.browser_automation/profile/` and returns only config keys listed in `CONFIG_ENV_KEYS` (if any).
 2. Document the refresh command in the connection file: `python3 "${TENX_PRIVATE_DIR:-$HOME/.incident-investigator-agent}/personal/{tool-name}/sso.py"` — the agent cannot self-refresh without the user present.
 3. Document the token TTL (usually ~8h) — so the user knows when to expect re-authentication prompts.
 
@@ -150,9 +151,9 @@ python3 shared_utils/traffic_sniffer.py --tool {tool}
 # Right:  --filter api.tool.com --filter /auth
 # Tip:    omit --filter entirely to capture all traffic, then grep the output.
 # ⚠ If the sniffer fails to start (profile locked), kill any lingering browser first:
-#   pkill -f {tool}_profile
+#   pkill -f 'browser_automation/profile'
 python3 shared_utils/traffic_sniffer.py \
-    --profile ~/.browser_automation/{tool}_profile \
+    --profile ~/.browser_automation/profile \
     --url https://app.tool.com \
     --filter /api \
     --output /tmp/{tool}_traffic.jsonl
@@ -336,7 +337,7 @@ env_vars:
   - TOOL_API_TOKEN
   - TOOL_BASE_URL
 sniffer:
-  profile: ~/.browser_automation/{tool}_profile
+  profile: ~/.browser_automation/profile
   url: https://app.tool.com
   filter: /api
 ---

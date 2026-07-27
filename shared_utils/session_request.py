@@ -8,7 +8,7 @@ automatically). Callable from CLI or imported by other Python scripts.
 
 Usage:
     python3 shared_utils/session_request.py \\
-        --profile ~/.browser_automation/linkedin_profile \\
+        --profile ~/.browser_automation/profile \\
         --warmup-url https://www.linkedin.com/feed/ \\
         --method GET \\
         --url https://www.linkedin.com/voyager/api/me \\
@@ -389,6 +389,7 @@ def tool_request(
     method: str,
     url: str,
     *,
+    profile_dir: Path | None = None,
     warmup_url: str | None = None,
     headers: dict[str, str] | None = None,
     body: str | bytes | dict | None = None,
@@ -403,15 +404,16 @@ def tool_request(
 
     Reads profile and warmup URL from the tool's connection-*.md frontmatter.
     Applies tool-specific auth defaults (CSRF cookies, Slack xoxc extraction, etc.).
+    Pass profile_dir to override the sniffer profile (e.g. account-scoped sessions).
     """
-    profile, resolved_warmup = _resolve_profile_and_warmup(tool, None, warmup_url)
+    resolved_profile, resolved_warmup = _resolve_profile_and_warmup(tool, profile_dir, warmup_url)
     defaults = _TOOL_DEFAULTS.get(tool, {})
     merged_headers = dict(defaults.get("headers") or {})
     if headers:
         merged_headers.update(headers)
 
     return session_request(
-        profile_dir=profile,
+        profile_dir=resolved_profile,
         method=method,
         url=url,
         warmup_url=resolved_warmup,

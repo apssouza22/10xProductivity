@@ -282,7 +282,7 @@ Once trusted, this can become a scheduled workflow.
 10x-host --trigger slack-polling --workflow workflows/assistant/assistant.md --engine cursor
 ```
 
-The trigger uses `SLACK_XOXC` and `SLACK_D_COOKIE` from `TENX_PRIVATE_DIR/.env`. It does not require a personal Slack app, Socket Mode, or webhook.
+The trigger uses the shared browser profile at `~/.browser_automation/profile/` (and `SLACK_WORKSPACE_URL` from `.env`).
 
 **Early scheduled job example: stand-up prep**
 
