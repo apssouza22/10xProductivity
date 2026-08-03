@@ -64,6 +64,10 @@ _TOOL_DEFAULTS: dict[str, dict[str, Any]] = {
         "via_page_fetch": True,
         "headers": {"Accept": "application/json"},
     },
+    "langfuse": {
+        "via_page_fetch": True,
+        "headers": {"Accept": "application/json"},
+    },
 }
 
 
