@@ -5,14 +5,14 @@ description: Confluence wiki — search pages, fetch content, browse spaces via 
 env_vars:
   - CONFLUENCE_BASE_URL
 sniffer:
-  profile: ~/.browser_automation/confluence_profile
+  profile: ~/.browser_automation/agent_profile
   url: ${CONFLUENCE_BASE_URL}
   filter: /rest/api
 ---
 
 # Confluence — browser session
 
-Confluence via a persistent browser profile (`~/.browser_automation/confluence_profile/`).
+Confluence via the shared browser profile (`~/.browser_automation/agent_profile/`).
 
 Env: `CONFLUENCE_BASE_URL` only (instance URL — not a secret).
 
@@ -58,7 +58,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --confluence-only
 ```
 
-Sign in through the browser if prompted — the session is saved in `~/.browser_automation/confluence_profile/`.
+Sign in through the browser if prompted — the session is saved in `~/.browser_automation/agent_profile/`.
 
 If another tool using the same profile is already logged in, Confluence may skip the login prompt.
 
@@ -136,6 +136,6 @@ for space in (result.get("json") or {}).get("results", []):
 ## Notes
 
 - **Cloud base URL** must include `/wiki` (e.g. `https://acme.atlassian.net/wiki`).
-- **Profile:** `~/.browser_automation/confluence_profile/`
+- **Profile:** `~/.browser_automation/agent_profile/`
 - **CQL syntax:** same as the REST API — `text~`, `title~`, `space=`, `type=page`.
 - **API token alternative:** `connection-api-token.md` if browser session REST calls return 401.

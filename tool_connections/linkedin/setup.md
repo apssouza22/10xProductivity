@@ -7,7 +7,7 @@ description: Set up LinkedIn connection using li_at session cookie. No developer
 
 ## Auth method: session-cookie (li_at)
 
-LinkedIn has no public API for personal use without app approval. This connection uses your browser session cookie (`li_at`) extracted via Playwright. A persistent browser profile is saved to `~/.browser_automation/linkedin_profile/` so LinkedIn recognizes the device — no 2FA after the first login.
+LinkedIn has no public API for personal use without app approval. This connection uses your browser session cookie (`li_at`) extracted via Playwright. Sessions are saved to the shared profile at `~/.browser_automation/agent_profile/` so LinkedIn recognizes the device — no 2FA after the first login.
 
 **What to ask the user:** Nothing. Just run `sso.py` — it opens a browser window for login.
 
@@ -23,10 +23,10 @@ python3 personal/linkedin/sso.py   # run from personal/ copy (see setup.md Step 
 ```
 
 2. A Chromium window opens. Log in to LinkedIn (complete 2FA if prompted — this is the only time).
-3. Once the feed loads, the session is saved in `~/.browser_automation/linkedin_profile/`.
+3. Once the feed loads, the session is saved in `~/.browser_automation/agent_profile/`.
 4. The browser window closes.
 
-**Second run and beyond:** the script reuses `~/.browser_automation/linkedin_profile/` and skips straight to feed — no login, no 2FA.
+**Second run and beyond:** the script reuses `~/.browser_automation/agent_profile/` and skips straight to feed — no login, no 2FA.
 
 ---
 
@@ -65,6 +65,6 @@ print(result["status"], mini["firstName"], mini["lastName"])
 No auth variables. LinkedIn session lives entirely in the browser profile:
 
 ```bash
-# Profile: ~/.browser_automation/linkedin_profile/
+# Profile: ~/.browser_automation/agent_profile/
 # Refresh: python3 tool_connections/linkedin/sso.py
 ```

@@ -95,7 +95,7 @@ Before asking the user for anything:
 
 **Choosing an auth method:** When a tool supports both browser session and API token, **try browser session first** — run `playwright_sso.py` and verify with `session_request.py`. Fall back to API token only if browser session fails or the instance blocks REST access from the profile.
 
-**Browser session API calls:** when a tool uses browser session auth (`auth: sso-session` or `auth: session-cookie`), all HTTP calls must go through `shared_utils/session_request.py` — not raw `urllib`, `curl`, or `requests`. Auth tokens and cookies stay in that tool's browser profile at `~/.browser_automation/{tool}_profile/` — never in `.env`. Only non-secret config (instance URLs) belongs in `.env`. Add a `sniffer:` block to the connection frontmatter (profile + warmup URL) so `tool_request("tool-name", ...)` can reuse the saved profile.
+**Browser session API calls:** when a tool uses browser session auth (`auth: sso-session` or `auth: session-cookie`), all HTTP calls must go through `shared_utils/session_request.py` — not raw `urllib`, `curl`, or `requests`. Auth tokens and cookies stay in the shared browser profile at `~/.browser_automation/agent_profile/` — never in `.env`. Only non-secret config (instance URLs) belongs in `.env`. Add a `sniffer:` block to the connection frontmatter (profile + warmup URL) so `tool_request("tool-name", ...)` can reuse the saved profile.
 
 
 **Browser fallback rule:** when no suitable API is available, use the tool's persistent profile (`sso.py` + `session_request.py`) for browser-backed reads. Use `traffic_sniffer.py` to discover replayable API endpoints before driving the DOM.
@@ -117,7 +117,7 @@ submit through a normal authenticated UI when `session_request.py` or a captured
 
 **Browser-session-only tools:** If the tool has no API token path and only supports signing in through a browser, browser session capture is the option. This is fine — but do three things:
 
-1. Write a plugin-compliant `sso.py` in `TENX_PRIVATE_DIR/personal/{tool-name}/` (not `tool_connections/`) with `TOOL_NAME`, `check(env) -> bool`, and `capture(env) -> dict`. `capture()` ensures the user is logged in via `profile_dir_for(TOOL_NAME)` and returns only config keys listed in `CONFIG_ENV_KEYS` (if any).
+1. Write a plugin-compliant `sso.py` in `TENX_PRIVATE_DIR/personal/{tool-name}/` (not `tool_connections/`) with `TOOL_NAME`, `check(env) -> bool`, and `capture(env) -> dict`. `capture()` ensures the user is logged in via the shared `agent_profile` and returns only config keys listed in `CONFIG_ENV_KEYS` (if any).
 2. Document the refresh command in the connection file: `python3 "${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/{tool-name}/sso.py"` — the agent cannot self-refresh without the user present.
 3. Document the token TTL (usually ~8h) — so the user knows when to expect re-authentication prompts.
 
@@ -142,9 +142,9 @@ python3 shared_utils/traffic_sniffer.py --tool {tool}
 # Right:  --filter api.tool.com --filter /auth
 # Tip:    omit --filter entirely to capture all traffic, then grep the output.
 # ⚠ If the sniffer fails to start (profile locked), kill any lingering browser first:
-#   pkill -f 'browser_automation/.*_profile'
+#   pkill -f 'browser_automation/agent_profile'
 python3 shared_utils/traffic_sniffer.py \
-    --profile ~/.browser_automation/my_tool_profile \
+    --profile ~/.browser_automation/agent_profile \
     --url https://app.tool.com \
     --filter /api \
     --output /tmp/{tool}_traffic.jsonl
@@ -326,7 +326,7 @@ env_vars:
   - TOOL_API_TOKEN
   - TOOL_BASE_URL
 sniffer:
-  profile: ~/.browser_automation/my_tool_profile
+  profile: ~/.browser_automation/agent_profile
   url: https://app.tool.com
   filter: /api
 ---

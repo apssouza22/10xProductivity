@@ -8,7 +8,7 @@ automatically). Callable from CLI or imported by other Python scripts.
 
 Usage:
     python3 shared_utils/session_request.py \\
-        --profile ~/.browser_automation/linkedin_profile \\
+        --profile ~/.browser_automation/agent_profile \\
         --warmup-url https://www.linkedin.com/feed/ \\
         --method GET \\
         --url https://www.linkedin.com/voyager/api/me \\
@@ -40,7 +40,7 @@ from urllib.parse import urlparse
 
 _REPO_ROOT = Path(__file__).parents[1]
 sys.path.insert(0, str(_REPO_ROOT))
-from shared_utils.browser import BROWSER_AUTOMATION_DIR, sync_playwright
+from shared_utils.browser import AGENT_PROFILE_DIR, sync_playwright
 from shared_utils.traffic_sniffer import _load_tool_config
 
 _BODY_LIMIT = 1 * 1024 * 1024  # 1 MB cap for CLI/library responses
@@ -389,7 +389,7 @@ def _resolve_profile_and_warmup(
         if warmup_url is None:
             warmup_url = _env_expand(cfg["url"])
     if profile is None:
-        raise ValueError("--profile is required unless --tool provides one via sniffer: config")
+        profile = AGENT_PROFILE_DIR
     return profile, warmup_url
 
 
@@ -421,7 +421,7 @@ def tool_request(
 
     Reads profile and warmup URL from the tool's connection-*.md frontmatter.
     Applies tool-specific auth defaults (CSRF cookies, Slack xoxc extraction, etc.).
-    Pass profile_dir to override the sniffer profile (e.g. account-scoped sessions).
+    Pass profile_dir to override the default shared profile (rare — most tools use agent_profile).
     """
     resolved_profile, resolved_warmup = _resolve_profile_and_warmup(tool, profile_dir, warmup_url)
     defaults = _TOOL_DEFAULTS.get(tool, {})

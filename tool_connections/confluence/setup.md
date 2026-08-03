@@ -17,7 +17,7 @@ Infer `CONFLUENCE_BASE_URL` from the URL:
 
 ## Browser session (try this first)
 
-No API token. Auth stays in the browser profile at `~/.browser_automation/confluence_profile/`.
+No API token. Auth stays in the shared browser profile at `~/.browser_automation/agent_profile/`.
 
 **What to ask the user:** the page URL (step 1) only.
 
@@ -109,7 +109,7 @@ curl -s -H "Authorization: Bearer $CONFLUENCE_TOKEN" \
 **Browser session:**
 ```bash
 # --- Confluence ---
-# Auth: ~/.browser_automation/confluence_profile/
+# Auth: ~/.browser_automation/agent_profile/
 # Refresh: python3 shared_utils/playwright_sso.py --confluence-only
 CONFLUENCE_BASE_URL=https://yourcompany.atlassian.net/wiki
 ```

@@ -10,7 +10,7 @@ env_vars:
 
 # Confluence
 
-> **Also available:** `connection-sso.md` — browser session via `~/.browser_automation/confluence_profile/`, no API token.
+> **Also available:** `connection-sso.md` — browser session via `~/.browser_automation/agent_profile/`, no API token.
 
 Env: `CONFLUENCE_TOKEN`, `CONFLUENCE_EMAIL`, `CONFLUENCE_BASE_URL`
 

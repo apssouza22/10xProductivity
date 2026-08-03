@@ -1,8 +1,8 @@
 """
 Slack browser session capture — plugin for playwright_sso.py discovery.
 
-Opens the Slack workspace in a persistent browser profile. Auth (xoxc token,
-d cookie, localStorage) stays in ~/.browser_automation/slack_profile/ — not
+Opens the Slack workspace in the shared browser profile. Auth (xoxc token,
+d cookie, localStorage) stays in ~/.browser_automation/agent_profile/ — not
 in .env. Only SLACK_WORKSPACE_URL belongs in .env.
 
 Standalone usage:
@@ -32,8 +32,7 @@ CONFIG_ENV_KEYS = ["SLACK_WORKSPACE_URL"]
 def _profile_dir(env: dict | None = None) -> Path:
     sys.path.insert(0, str(Path(__file__).parents[2]))
     from shared_utils.browser import profile_dir_for
-    account = (env or {}).get("SSO_ACCOUNT")
-    return profile_dir_for(TOOL_NAME, account)
+    return profile_dir_for()
 
 
 def check(env: dict) -> bool:

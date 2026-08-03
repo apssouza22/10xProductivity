@@ -5,14 +5,14 @@ description: Slack — two complementary modes. (1) Slack AI: post a natural-lan
 env_vars:
   - SLACK_WORKSPACE_URL
 sniffer:
-  profile: ~/.browser_automation/slack_profile
+  profile: ~/.browser_automation/agent_profile
   url: ${SLACK_WORKSPACE_URL}
   filter: /api/
 ---
 
 # Slack
 
-Access is via your own user session in a persistent browser profile (`~/.browser_automation/slack_profile/`). No Slack app installation or admin approval needed.
+Access is via your own user session in the shared browser profile (`~/.browser_automation/agent_profile/`). No Slack app installation or admin approval needed.
 
 Env: `SLACK_WORKSPACE_URL` only (instance URL — not a secret). Auth tokens stay in the browser profile. Refresh via `python3 shared_utils/playwright_sso.py --slack-only` when the session stops working.
 
@@ -46,7 +46,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --slack-only
 ```
 
-The script opens Chromium. Sign in through the browser if prompted — the session is saved in `~/.browser_automation/slack_profile/`. Nothing auth-related is written to `.env`.
+The script opens Chromium. Sign in through the browser if prompted — the session is saved in `~/.browser_automation/agent_profile/`. Nothing auth-related is written to `.env`.
 
 For a second workspace, set a scoped URL and refresh with `--account`:
 
@@ -58,7 +58,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --slack-only --account acme
 ```
 
-The account name becomes an uppercase prefix in `.env` keys and a separate profile at `~/.browser_automation/slack_{account}_profile/`:
+The account name becomes an uppercase prefix in `.env` keys (e.g. `SLACK_ACME_WORKSPACE_URL`). All tools share the same browser profile at `~/.browser_automation/agent_profile/`:
 
 ```bash
 # .env
@@ -68,7 +68,7 @@ source .venv/bin/activate
 python3 shared_utils/playwright_sso.py --slack-only --account acme
 ```
 
-That uses `SLACK_ACME_WORKSPACE_URL` in `.env` with the acme-scoped browser profile.
+That uses `SLACK_ACME_WORKSPACE_URL` in `.env` with the shared browser profile.
 
 ## Verified multi-workspace flow
 

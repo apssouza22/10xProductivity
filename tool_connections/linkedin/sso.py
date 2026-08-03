@@ -2,7 +2,7 @@
 """
 LinkedIn session capture via Playwright.
 
-Uses a persistent browser profile at ~/.browser_automation/linkedin_profile/ so
+Uses the shared browser profile at ~/.browser_automation/agent_profile/ so
 LinkedIn treats the browser as a known device — no 2FA after the first login.
 Auth cookies (li_at, JSESSIONID) stay in the profile — not in .env.
 
@@ -25,7 +25,7 @@ from shared_utils.browser import (
 
 TOOL_NAME = "linkedin"
 CONFIG_ENV_KEYS: list[str] = []
-PROFILE_DIR = profile_dir_for(TOOL_NAME)
+PROFILE_DIR = profile_dir_for()
 
 
 def _open_persistent(p):

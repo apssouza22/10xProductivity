@@ -5,8 +5,8 @@ Browser session refresher — discovery orchestrator.
 Discovers all tool_connections/*/sso.py plugins and delegates to them.
 Each plugin exposes: TOOL_NAME, check(env) -> bool, capture(env) -> dict.
 Optional CONFIG_ENV_KEYS lists non-secret config vars that may be written to
-.env (instance URLs, workspace URLs). Auth stays in each tool's browser profile
-at ~/.browser_automation/{tool}_profile/ — never in .env.
+.env (instance URLs, workspace URLs). Auth stays in the shared browser profile
+at ~/.browser_automation/agent_profile/ — never in .env.
 
 Usage:
     python3 playwright_sso.py                  # refresh all expired sessions
@@ -121,10 +121,7 @@ def tokens_for_account(tokens: dict[str, str], account: str | None) -> dict[str,
 
 
 def profile_for_plugin(mod: object, account: str | None) -> Path:
-    tool = getattr(mod, "TOOL_NAME", None)
-    if not tool:
-        raise ValueError(f"Plugin {mod!r} missing TOOL_NAME")
-    return profile_dir_for(tool, account)
+    return profile_dir_for()
 
 
 # ---------------------------------------------------------------------------
@@ -166,7 +163,7 @@ def main():
         metavar="NAME",
         help=(
             "Account-scoped config (e.g. SLACK_ACME_WORKSPACE_URL in .env). "
-            "Uses a separate profile at ~/.browser_automation/{tool}_{account}_profile/."
+            "Uses the shared profile at ~/.browser_automation/agent_profile/."
         ),
     )
     parser.add_argument(
@@ -182,7 +179,7 @@ def main():
     args = parser.parse_args()
 
     if args.list:
-        print("Discovered SSO plugins (profiles: ~/.browser_automation/{tool}_profile/):")
+        print("Discovered SSO plugins (shared profile: ~/.browser_automation/agent_profile/):")
         for name, mod in plugins.items():
             cfg = ", ".join(config_keys(mod)) or "(no .env config — profile only)"
             print(f"  {name:20s}  .env: {cfg}")

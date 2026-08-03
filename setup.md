@@ -96,7 +96,7 @@ For each tool the user selected, follow this routing in order — stop at the fi
 
 **Validation is mandatory on all paths.** Run the verify snippet and confirm it returns expected output before marking a tool as done.
 
-**Browser-session tools need bootstrapping.** When a connection uses browser session auth (`auth: sso-session` or `auth: session-cookie` in frontmatter), auth stays in that tool's browser profile at `~/.browser_automation/{tool}_profile/` — not in `.env`. Only instance URLs go in `.env`. Run `playwright_sso.py` for that tool before the verify snippet. API calls use `shared_utils/session_request.py`.
+**Browser-session tools need bootstrapping.** When a connection uses browser session auth (`auth: sso-session` or `auth: session-cookie` in frontmatter), auth stays in the shared browser profile at `~/.browser_automation/agent_profile/` — not in `.env`. Only instance URLs go in `.env`. Run `playwright_sso.py` for that tool before the verify snippet. API calls use `shared_utils/session_request.py`.
 
 ---
 
@@ -131,7 +131,7 @@ Note: {any critical gotcha that would cause silent failure}  ← omit if none
 
 **Rules for each field:**
 - **Instance** — the real URL the verify snippet hit (e.g. `https://jira.company.example`, not `https://jira.yourcompany.com`). Include prod vs dev if both exist.
-- **Auth** — the method that actually passed verification. For browser-session tools, cite the tool profile path (e.g. `~/.browser_automation/slack_profile/`). For API-token tools, name the header format; for Cloud vs Server/DC variants (Jira, Confluence), name the variant explicitly. Never list session tokens in verified_connections.
+- **Auth** — the method that actually passed verification. For browser-session tools, cite the shared profile path (`~/.browser_automation/agent_profile/`). For API-token tools, name the header format; for Cloud vs Server/DC variants (Jira, Confluence), name the variant explicitly. Never list session tokens in verified_connections.
 - **Active env** — only vars that are populated with real values. If a var is present in `TENX_PRIVATE_DIR/.env` but is a placeholder (e.g. `you@yourcompany.com`), omit it and add a Note explaining it should be ignored.
 - **Refresh** — include for any short-lived browser session or token (often ~8h). Omit for long-lived API tokens and PATs.
 - **Note** — include only if there is a silent failure risk: a placeholder var that must be ignored, a CLI that must be used instead of REST, a required prerequisite (VPN, `/etc/hosts`, Zscaler), or a common misidentification (e.g. PHX-XXXXX vs PHOENIX-XXXX).
@@ -224,7 +224,7 @@ SLACK_WORKSPACE_URL=https://yourcompany.slack.com/
 TENX_AGENT_ENGINE=cursor
 ```
 
-Slack auth uses the browser profile at `~/.browser_automation/slack_profile/` (and `SLACK_WORKSPACE_URL` from `.env`).
+Slack auth uses the shared browser profile at `~/.browser_automation/agent_profile/` (and `SLACK_WORKSPACE_URL` from `.env`).
 
 
 ## Contributing fixes upstream

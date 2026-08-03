@@ -1,6 +1,6 @@
 ---
 name: tool-connector
-description: Connect any tool you use at work to your agent — including internal company tools, custom-built systems, deployment portals, incident trackers, internal knowledge bases, HR systems, and commercial tools like Slack, Confluence, Jira, Linear, GitHub, Outlook, Datadog, and PagerDuty. Use when the user wants to set up a tool connection, connect an internal or custom-built tool, or add a new tool integration from scratch.
+description: Connect any tool you use at work to your agent — including internal company tools, custom-built systems, deployment portals, incident trackers, internal knowledge bases, HR systems, and commercial tools like Slack, Confluence, Jira, GitHub, and PagerDuty. Use when the user wants to set up a tool connection, connect an internal or custom-built tool, or add a new tool integration from scratch.
 source: https://github.com/apssouza22/auto-pilot-agent
 author: apssouza22
 ---
@@ -13,7 +13,8 @@ Full methodology and pre-built recipes: https://github.com/apssouza22/auto-pilot
 
 ## Internal tools are first-class citizens
 
-Internal and custom-built tools are often the most valuable to connect — deployment portals, incident trackers, internal knowledge bases, custom dashboards, HR systems, anything your company built or runs. They follow the exact same setup path as commercial tools and stay private in `personal/` (gitignored, never committed).
+Internal and custom-built tools are often the most valuable to connect — deployment portals, incident trackers, internal knowledge bases, 
+custom dashboards, HR systems, anything your company built or runs. They follow the exact same setup path as commercial tools and stay private in `personal/` (gitignored, never committed).
 
 If a tool has an API or a web UI, it can be connected.
 
@@ -39,9 +40,9 @@ Never edit `tool_connections/` directly — copy to `personal/{tool}/` and patch
 
 | Priority | Method | User friction |
 |----------|--------|---------------|
-| 1 | API token | ~30s — generate in tool settings |
-| 2 | Browser session (SSO, cached) | Run once — session cached for days/weeks |
-| 3 | Browser session (per operation) | Playwright on every call — only if no API exists |
+| 1        | Browser session (SSO, cached) | Run once — session cached for days/weeks |
+| 2        | API token | ~30s — generate in tool settings |
+| 3        | Browser session (per operation) | Playwright on every call — only if no API exists |
 
 ## Pre-built recipes available
 

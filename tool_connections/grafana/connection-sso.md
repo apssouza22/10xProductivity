@@ -5,14 +5,14 @@ description: Grafana dashboards — extract PromQL queries from panels, look up 
 env_vars:
   - GRAFANA_BASE_URL
 sniffer:
-  profile: ~/.browser_automation/grafana_profile
+  profile: ~/.browser_automation/agent_profile
   url: ${GRAFANA_BASE_URL}
   filter: /api/
 ---
 
 # Grafana
 
-Env: `GRAFANA_BASE_URL` only (instance URL). Session cookie lives in `~/.browser_automation/grafana_profile/`.
+Env: `GRAFANA_BASE_URL` only (instance URL). Session cookie lives in `~/.browser_automation/agent_profile/`.
 
 ```bash
 # Set in .env:
@@ -145,7 +145,7 @@ for ds in result.get("json") or []:
 
 ## Notes on auth
 
-Session cookies are stored in `~/.browser_automation/grafana_profile/`. Session lifetime varies by instance (often a few hours). Re-run `playwright_sso.py --grafana-only` when API calls return 401.
+Session cookies are stored in `~/.browser_automation/agent_profile/`. Session lifetime varies by instance (often a few hours). Re-run `playwright_sso.py --grafana-only` when API calls return 401.
 
 If your Grafana uses API keys instead of browser session:
 ```bash

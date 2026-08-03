@@ -33,7 +33,7 @@ Workflow:
 
   Example frontmatter:
     sniffer:
-      profile: ~/.browser_automation/{tool}_profile
+      profile: ~/.browser_automation/agent_profile
       url: https://www.linkedin.com/feed/
       filter: /voyager/api
 
@@ -44,7 +44,7 @@ Usage:
 
     # Explicit — full control:
     python3 shared_utils/traffic_sniffer.py \\
-        --profile ~/.browser_automation/linkedin_profile \\
+        --profile ~/.browser_automation/agent_profile \\
         --url https://www.linkedin.com/feed/ \\
         --filter /voyager/api \\
         --output /tmp/linkedin_traffic.jsonl
@@ -67,7 +67,7 @@ Usage (as a library):
     from shared_utils.traffic_sniffer import sniff
 
     sniff(
-        profile_dir=Path.home() / ".browser_automation" / "linkedin_profile",
+        profile_dir=Path.home() / ".browser_automation" / "agent_profile",
         start_url="https://www.linkedin.com/feed/",
         filters=["/voyager/api"],
         output_path=Path("/tmp/linkedin_traffic.jsonl"),
@@ -98,7 +98,7 @@ from pathlib import Path
 from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).parents[1]))
-from shared_utils.browser import TENX_PRIVATE_DIR, sync_playwright
+from shared_utils.browser import AGENT_PROFILE_DIR, TENX_PRIVATE_DIR, sync_playwright
 
 _REPO_ROOT = Path(__file__).parents[1]
 
@@ -171,7 +171,7 @@ def _load_tool_config(tool_name: str) -> dict:
     if not sniffer_match:
         raise ValueError(
             f"No sniffer: block in {conn_file} frontmatter.\n"
-            "Add a sniffer: block with profile:, url:, and filter: fields."
+            "Add a sniffer: block with url: and filter: fields (profile: is optional — defaults to agent_profile)."
         )
     sniffer_block = sniffer_match.group(1)
     cfg: dict = {}
@@ -181,13 +181,13 @@ def _load_tool_config(tool_name: str) -> dict:
             cfg[m.group(1)] = m.group(2).strip()
 
     profile_str = cfg.get("profile", "")
-    profile = _expand_path(profile_str) if profile_str else Path()
+    profile = _expand_path(profile_str) if profile_str else AGENT_PROFILE_DIR
     url = cfg.get("url", "")
     filters_raw = cfg.get("filter", "")
     filters = [f.strip() for f in filters_raw.split(",") if f.strip()] if filters_raw else []
 
-    if not profile_str or not url:
-        raise ValueError(f"sniffer: block in {conn_file} must have both profile: and url: fields.")
+    if not url:
+        raise ValueError(f"sniffer: block in {conn_file} must have a url: field.")
 
     return {"profile": profile, "url": url, "filters": filters, "tool": tool_name, "conn_file": conn_file}
 
