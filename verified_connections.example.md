@@ -41,6 +41,15 @@ API-token alternative: `tool_connections/confluence/connection-api-token.md`
 
 ---
 
+## Langfuse → `tool_connections/langfuse/connection-sso.md`
+
+Langfuse LLM observability — browse traces, investigate agent/LLM failures, find errors and slow runs. Use when investigating LLM incidents or correlating trace IDs from alerts.
+Env: `LANGFUSE_BASE_URL`, `LANGFUSE_PROJECT_ID`. Auth: `~/.browser_automation/agent_profile/` (refresh with `python3 shared_utils/playwright_sso.py --langfuse-only`)
+
+API-key alternative: `tool_connections/langfuse/connection-api-key.md`
+
+---
+
 ## Adding new connections
 
 Add `tool_connections/{tool}/connection-*.md` with core frontmatter (`name`, `auth`, `description`, `env_vars`). After verifying, append a section to `TENX_PRIVATE_DIR/verified_connections.md` following the format above.
