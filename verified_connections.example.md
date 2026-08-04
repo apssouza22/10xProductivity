@@ -50,6 +50,13 @@ API-key alternative: `tool_connections/langfuse/connection-api-key.md`
 
 ---
 
+## Airflow → `tool_connections/airflow/connection-sso.md`
+
+Apache Airflow — list DAGs, inspect runs, read task logs, check scheduler health. Use for pipeline incidents, failed DAG runs, and task debugging.
+Env: `AIRFLOW_BASE_URL`. Auth: `~/.browser_automation/agent_profile/` (refresh with `python3 shared_utils/playwright_sso.py --airflow-only`)
+
+---
+
 ## Adding new connections
 
 Add `tool_connections/{tool}/connection-*.md` with core frontmatter (`name`, `auth`, `description`, `env_vars`). After verifying, append a section to `TENX_PRIVATE_DIR/verified_connections.md` following the format above.

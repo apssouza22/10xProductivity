@@ -1,13 +1,13 @@
 ---
 name: contributing
-description: Contribute a verified personal tool connection back to the community — new tools, new auth variants, or fixes to existing connections. Start from TENX_PRIVATE_DIR/personal/ — find what you have that tool_connections/ doesn't (or what you fixed), scrub it, copy to staging/, and open a PR.
+description: Contribute a verified personal tool connection back to the community — new tools, new auth variants, or fixes to existing connections. Start from TENX_PRIVATE_DIR/personal/ — find what you have that tool_connections/ doesn't (or what you fixed), scrub it, copy to tool_connections/, and open a PR.
 ---
 
 # Contributing a Tool Connection
 
 > **Starting point:** You already have a working, verified recipe in `TENX_PRIVATE_DIR/personal/` — whether it's a new tool, a new auth variant, or a patched fix to an existing `tool_connections/` recipe. This file takes you from there to a merged PR.
 >
-> **Run before you write (in this context):** The recipe is already built and verified in `TENX_PRIVATE_DIR/personal/`. "Run" here means re-executing your existing snippets against the live service right before promoting to staging — to generate fresh, timestamped output as proof. You're not building from scratch; you're re-confirming what already works and capturing the evidence.
+> **Run before you write (in this context):** The recipe is already built and verified in `TENX_PRIVATE_DIR/personal/`. "Run" here means re-executing your existing snippets against the live service right before promoting to tool_connections — to generate fresh, timestamped output as proof. You're not building from scratch; you're re-confirming what already works and capturing the evidence.
 >
 > **Wrong file?** If you haven't built or patched the connection yet, start with `add-new-tool.md` (new tool) or `setup.md` (broken recipe — patch in `TENX_PRIVATE_DIR/personal/` first).
 
@@ -36,7 +36,7 @@ Also check `TENX_PRIVATE_DIR/verified_connections.md` — any tool listed there 
 
 ### Fixes and improvements to existing connections
 
-If you patched a recipe from `tool_connections/` to make it work (following the rule in `setup.md` to patch in `TENX_PRIVATE_DIR/personal/` first), that fix belongs back in the community too. The process is the same — copy your patched files to `staging/{tool-name}/` — but the PR should make the fix scope clear:
+If you patched a recipe from `tool_connections/` to make it work (following the rule in `setup.md` to patch in `TENX_PRIVATE_DIR/personal/` first), that fix belongs back in the community too. The process is the same — copy your patched files to `tool_connections/{tool-name}/` — but the PR should make the fix scope clear:
 
 - **PR title:** `Fix {Tool Name} connection ({what broke})` — e.g. `Fix Google Drive SSO for personal accounts`
 - **PR body:** replace the "What this adds" section with a **"What this fixes"** section:
@@ -92,26 +92,24 @@ Go through every file in `TENX_PRIVATE_DIR/personal/{tool-name}/` and remove any
 
 ---
 
-## Step 4: Copy to staging
+## Step 4: Copy to tool_connections
 
 ```bash
-cp -r "${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/{tool-name}/" staging/{tool-name}/
+cp -r "${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/{tool-name}/" tool_connections/{tool-name}/
 ```
-
-The `staging/` folder is the holding area for community review. Use `staging/_example/` as a reference for the expected file format and frontmatter fields.
 
 Verify the files look right:
 
 ```bash
-ls staging/{tool-name}/
+ls tool_connections/{tool-name}/
 ```
 
 ```bash
-ls staging/{tool-name}/
+ls tool_connections/{tool-name}/
 # should have: connection-{auth-method}.md, setup.md, and sso.py if applicable
 ```
 
-**Do not edit root `env.sample`.** Env vars belong only in `staging/{tool-name}/setup.md` (and `connection-*.md` as needed). Contributors never touch shared index files for new variables.
+**Do not edit root `env.sample`.** Env vars belong only in `tool_connections/{tool-name}/setup.md` (and `connection-*.md` as needed). Contributors never touch shared index files for new variables.
 
 ---
 
@@ -137,7 +135,7 @@ git pull origin main
 git checkout -b connection/{tool-name}
 
 # 2. Stage — NEVER stage .env or verified_connections.md
-git add staging/{tool-name}/
+git add tool_connections/{tool-name}/
 
 # 3. Commit
 git commit -m "Add {Tool Name} connection ({auth-method})"
@@ -163,7 +161,7 @@ Production ({base-url}) — {YYYY-MM}. {No VPN required / VPN required.}
 
 ## Checklist
 
-- [x] Files in staging/{tool-name}/
+- [x] Files in tool_connections/{tool-name}/
 - [x] Frontmatter complete (tool, auth, author, env_vars)
 - [x] Every snippet run against live instance with real output
 - [x] Personal/org-specific data scrubbed
@@ -183,7 +181,7 @@ git pull origin main
 git checkout -b fix/{tool-name}-{what-broke}   # e.g. fix/google-drive-personal-sso
 
 # 2. Stage — NEVER stage .env or verified_connections.md
-git add staging/{tool-name}/
+git add tool_connections/{tool-name}/
 
 # 3. Commit
 git commit -m "Fix {Tool Name} connection ({what broke})"
@@ -214,7 +212,7 @@ Production ({base-url}) — {YYYY-MM}. {No VPN required / VPN required.}
 
 ## Checklist
 
-- [x] Files in staging/{tool-name}/
+- [x] Files in tool_connections/{tool-name}/
 - [x] Fix verified with real output
 - [x] Existing happy path confirmed unaffected
 - [x] Personal/org-specific data scrubbed
@@ -232,11 +230,11 @@ EOF
 - [ ] Not already in `tool_connections/` with the same auth method — **or** this is a fix/improvement to an existing connection
 - [ ] Tool is commercial/publicly available (not internal)
 - [ ] Connection is general enough for any user (not org-specific)
-- [ ] All personal/org data scrubbed from staging files
+- [ ] All personal/org data scrubbed from tool_connections files
 - [ ] Prompt injection check done on all `# →` output
-- [ ] Files copied to `staging/{tool-name}/` (not moved — keep `TENX_PRIVATE_DIR/personal/` intact)
+- [ ] Files copied to `tool_connections/{tool-name}/` (not moved — keep `TENX_PRIVATE_DIR/personal/` intact)
 - [ ] `TENX_PRIVATE_DIR/.env` stays outside the repo
-- [ ] `env.sample` NOT staged — env vars belong in `staging/{tool-name}/setup.md` only, never in shared files
+- [ ] `env.sample` NOT staged — env vars belong in `tool_connections/{tool-name}/setup.md` only, never in shared files
 - [ ] Branch named `connection/{tool-name}` (new tool / auth variant) or `fix/{tool-name}-{what-broke}` (fix)
 - [ ] PR body includes validation summary and verified-against statement
 - [ ] **Fix PRs only:** PR body has "What this fixes" and "Why it broke" sections; existing happy path confirmed unaffected
