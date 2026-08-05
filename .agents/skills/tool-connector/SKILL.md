@@ -53,3 +53,5 @@ Internal and custom tools follow the same path — they stay private in `persona
 ## Getting started
 
 Then read `setup.md`. It routes to pre-built recipes, your own recipes, and `add-new-tool.md` for anything new.
+
+**New tool with no recipe:** prompt *"Set up and run sniffer to find out useful endpoints for the tool XXX."* (replace `XXX` with the tool name).

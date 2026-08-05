@@ -94,6 +94,12 @@ For each tool the user selected, follow this routing in order — stop at the fi
 | 3 | Tool has a recipe in `tool_connections/{tool-name}/` | Copy `tool_connections/{tool-name}/` → `TENX_PRIVATE_DIR/personal/{tool-name}/` (exact copy), then load `TENX_PRIVATE_DIR/personal/{tool-name}/setup.md` and follow it — never run directly from `tool_connections/`, never edit `tool_connections/` directly |
 | 4 | Tool not found anywhere | Run `add-new-tool.md` — it builds a recipe in `TENX_PRIVATE_DIR/personal/{tool-name}/` from scratch |
 
+**New tool with no recipe?** Prompt your agent:
+
+> *"Set up and run sniffer to find out useful endpoints for the tool XXX."*
+
+Replace `XXX` with the tool name (e.g. Datadog, your internal portal). The agent follows `add-new-tool.md` — researching auth, running `traffic_sniffer.py`, and writing verified connection files to `TENX_PRIVATE_DIR/personal/`.
+
 **Validation is mandatory on all paths.** Run the verify snippet and confirm it returns expected output before marking a tool as done.
 
 **Browser-session tools need bootstrapping.** When a connection uses browser session auth (`auth: sso-session` or `auth: session-cookie` in frontmatter), auth stays in the shared browser profile at `~/.browser_automation/agent_profile/` — not in `.env`. Only instance URLs go in `.env`. Run `playwright_sso.py` for that tool before the verify snippet. API calls use `shared_utils/session_request.py`.

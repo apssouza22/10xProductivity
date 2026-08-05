@@ -214,6 +214,14 @@ pip install -e ".[dev]"
 Read setup.md and set up my personal AI assistant for work.
 ```
 
+For a tool that has no recipe yet, prompt:
+
+```text
+Set up and run sniffer to find out useful endpoints for the tool XXX.
+```
+
+Replace `XXX` with the tool name. See [`add-new-tool.md`](add-new-tool.md).
+
 6. Try a first workflow:
 
 ```text

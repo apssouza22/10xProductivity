@@ -10,6 +10,7 @@ description: "[your-device-name] Your active tool connections — verified and r
 
 - **Your active connections:** load `TENX_PRIVATE_DIR/verified_connections.md` (device-specific, outside the public repo, never committed).
 - **To set up connections:** *"Read setup.md and set up my tool connections."*
+- **To set up a new tool:** *"Set up and run sniffer to find out useful endpoints for the tool XXX."*
 - **To refresh short-lived tokens (~8h):** run the tool's `sso.py` (e.g. `source .venv/bin/activate && python3 tool_connections/slack/sso.py`)
 
 > **`device:`** Set this to your machine name (e.g. `my-macbook`, `work-laptop`). Because `TENX_PRIVATE_DIR/verified_connections.md` is device-specific and outside the public repo — each machine has its own set of verified tokens — the device field lets the agent know which machine it's running on and prevents confusion when context from multiple devices appears in the same session.

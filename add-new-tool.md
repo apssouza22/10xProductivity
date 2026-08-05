@@ -10,6 +10,8 @@ description: Add a new tool from scratch — research auth, validate against a l
 > **Wrong file?** If the tool already exists in `tool_connections/` or `TENX_PRIVATE_DIR/personal/`, use `setup.md` instead — it will route you to the right recipe and handle patching if something is broken.
 >
 > **Want to contribute back?** After completing Phase 1, read `contributing.md`.
+>
+> **To set up a new tool:** *"Set up and run sniffer to find out useful endpoints for the tool XXX."*
 
 ## Purpose
 
