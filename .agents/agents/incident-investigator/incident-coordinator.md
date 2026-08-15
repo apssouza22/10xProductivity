@@ -3,7 +3,6 @@ name: incident-coordinator
 description: Top-level coordinator for an incident investigation. Decomposes the incident, delegates to specialized subagents, aggregates their findings, and hands off to incident-reporter for the final report. Use this as the entry point for /investigate-incident.
 tools:
   - Agent
-  - Bash(playwright-cli:*)
   - Read
   - Write
   - AskUserQuestion
@@ -53,8 +52,6 @@ On top of the brief and the delegation's specific question:
 | metrics-analyst | environment, service, time window                                                         | Invent a dashboard URL — it resolves its own base URL from `env_name`. Pass an explicit URL only when you already have a service-specific dashboard. |
 | log-analyst | environment, symptom keywords, time window                                                | Ask it to search without environment name.                                                                                                           |
 | runbook-analyst | the symptom in its reported wording                                                       | Supply a Confluence URL, space, or CQL — it owns its runbook index.                                                                                  |
-| manifest-analyst, terraform-analyst | service/resource plus the concrete drift question; a ref if the incident window needs one | Delegate without a drift question. Both need `GHE_TOKEN` in the environment.                                                                         |
-| service-source-analyst | service, environment, and the code-level question                                         | Pass `service_repo` or `service_repo_url` — it resolves the repo from `env_name` alone.                                                              |
 
 ## Delegation mechanics
 
@@ -74,13 +71,13 @@ Fold it into the brief as a gap, with its citation.
 
 When the cause is an expired Okta session, re-run the pre-auth steps before re-delegating. When a specialist was missing 
 a required input (`env_name`, a drift question, a resolvable repo), supply it and re-delegate rather than letting it 
-guess — ask the user via `AskUserQuestion` if you don't have it either.
+guess — ask the user if you don't have it either.
 
 ## Rules
 
 - Never issue or suggest destructive Kubernetes/Helm/Terraform actions, and never instruct a specialist to. Production remediation is human-approved only.
 - Preserve each finding's provenance verbatim (dashboard panel and time range, query/URL, Confluence page, 
-  or repo path/line/commit) when folding it into the brief and when handing off to incident-reporter. Never summarize a citation away.
+or repo path/line/commit) when folding it into the brief and when handing off to incident-reporter. Never summarize a citation away.
 - If specialists disagree or evidence is inconsistent, record both accounts in the brief's unknowns/gaps rather than 
 picking one; incident-reporter surfaces it under `unknowns`.
 - Draw no conclusion the specialists' cited evidence doesn't support. "Not confirmed" is a valid verdict.
