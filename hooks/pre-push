@@ -4,7 +4,7 @@
 # Designed for the repo owner (pushes to main), but safe to install by anyone:
 #   - Fast scan runs for all pushes to GitHub — catches real credentials/personal data.
 #   - AI review is REQUIRED. A push is blocked if the agent is missing or unauthenticated.
-#     Escape hatch: set SKIP_AI_REVIEW=1 in TENX_PRIVATE_DIR/.env for an intentional, logged bypass.
+#     Escape hatch: set SKIP_AI_REVIEW=1 in AUTO_PILOT_PRIVATE_DIR/.env for an intentional, logged bypass.
 #
 # Two layers:
 #   1. Fast regex scan — blocks obvious credentials, .env, personal/ files. No API call.
@@ -24,11 +24,11 @@ set -euo pipefail
 REMOTE="$1"
 URL="$2"
 
-# Load BANNED_TERM from TENX_PRIVATE_DIR/.env — never committed as a literal
+# Load BANNED_TERM from AUTO_PILOT_PRIVATE_DIR/.env — never committed as a literal
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || echo "$SCRIPT_DIR/..")"
-TENX_PRIVATE_DIR="${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}"
-ENV_FILE="$TENX_PRIVATE_DIR/.env"
+AUTO_PILOT_PRIVATE_DIR="${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}"
+ENV_FILE="$AUTO_PILOT_PRIVATE_DIR/.env"
 BANNED_TERM=""
 SKIP_AI_REVIEW=""
 ENV_CURSOR_API_KEY=""
@@ -44,7 +44,7 @@ if [[ -f "$ENV_FILE" ]]; then
     done < "$ENV_FILE"
 fi
 
-# Prefer the long-lived CURSOR_API_KEY (from TENX_PRIVATE_DIR/.env) for the agent
+# Prefer the long-lived CURSOR_API_KEY (from AUTO_PILOT_PRIVATE_DIR/.env) for the agent
 # review so it runs non-interactively and does not depend on a short-lived
 # `agent login` keychain session. Only set if not already provided in the env.
 if [[ -z "${CURSOR_API_KEY:-}" && -n "$ENV_CURSOR_API_KEY" ]]; then
@@ -158,8 +158,8 @@ echo "✅ Fast scan passed."
 # ── Step 2: Agent review ──────────────────────────────────────────────────────
 # Escape hatch: SKIP_AI_REVIEW=1 in .env bypasses the agent review intentionally.
 if [[ "${SKIP_AI_REVIEW:-}" == "1" ]]; then
-    echo "⚠️  AI review bypassed — SKIP_AI_REVIEW=1 is set in TENX_PRIVATE_DIR/.env. Fast scan passed."
-    echo "   Remove SKIP_AI_REVIEW from TENX_PRIVATE_DIR/.env when done."
+    echo "⚠️  AI review bypassed — SKIP_AI_REVIEW=1 is set in AUTO_PILOT_PRIVATE_DIR/.env. Fast scan passed."
+    echo "   Remove SKIP_AI_REVIEW from AUTO_PILOT_PRIVATE_DIR/.env when done."
     exit 0
 fi
 
@@ -180,7 +180,7 @@ else
     echo "❌ Push blocked — no agent found and AI review is required."
     echo "   Fix: install Cursor agent (https://cursor.com) and run: agent login"
     echo "   Or set AI_REVIEW_CMD to any CLI that reads a prompt from stdin."
-    echo "   To bypass intentionally: set SKIP_AI_REVIEW=1 in TENX_PRIVATE_DIR/.env"
+    echo "   To bypass intentionally: set SKIP_AI_REVIEW=1 in AUTO_PILOT_PRIVATE_DIR/.env"
     exit 1
 fi
 
@@ -200,7 +200,7 @@ if $USING_CURSOR_AGENT && [[ -z "${CURSOR_API_KEY:-}" ]]; then
         echo "❌ Push blocked — Cursor agent is not authenticated."
         echo "   Fix: run 'agent login' once (opens browser, saves to keychain)."
         echo "   Current status: $AGENT_WHOAMI"
-        echo "   To bypass intentionally: set SKIP_AI_REVIEW=1 in TENX_PRIVATE_DIR/.env"
+        echo "   To bypass intentionally: set SKIP_AI_REVIEW=1 in AUTO_PILOT_PRIVATE_DIR/.env"
         exit 1
     fi
 fi
@@ -308,7 +308,7 @@ else
 fi || {
     echo "❌ Push blocked — agent failed to run and AI review is required."
     echo "   Check that the agent CLI is working: agent -p --mode=ask --trust 'say: ok'"
-    echo "   To bypass intentionally: set SKIP_AI_REVIEW=1 in TENX_PRIVATE_DIR/.env"
+    echo "   To bypass intentionally: set SKIP_AI_REVIEW=1 in AUTO_PILOT_PRIVATE_DIR/.env"
     exit 1
 }
 
@@ -327,6 +327,6 @@ else
     echo "❌ Push blocked — agent returned an unexpected verdict format (not PASS or FAIL)."
     echo "   Agent output:"
     cat "$VERDICT_FILE" | sed 's/^/    /'
-    echo "   To bypass intentionally: set SKIP_AI_REVIEW=1 in TENX_PRIVATE_DIR/.env"
+    echo "   To bypass intentionally: set SKIP_AI_REVIEW=1 in AUTO_PILOT_PRIVATE_DIR/.env"
     exit 1
 fi

@@ -9,8 +9,8 @@
 
 set -euo pipefail
 
-TENX_PRIVATE_DIR="${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}"
-ENV_FILE="$TENX_PRIVATE_DIR/.env"
+AUTO_PILOT_PRIVATE_DIR="${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}"
+ENV_FILE="$AUTO_PILOT_PRIVATE_DIR/.env"
 BANNED_TERM=""
 if [[ -f "$ENV_FILE" ]]; then
     while IFS='=' read -r key value; do

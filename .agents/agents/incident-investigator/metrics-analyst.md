@@ -33,5 +33,5 @@ See @rules/subagent-scratchpad.md.
 Fetch metrics from Grafana via the shared browser session.
 
 **Reference file** — read your active copy first, fall back to the community recipe:
-1. `${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/grafana/connection-sso.md` (your active copy)
+1. `${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/grafana/connection-sso.md` (your active copy)
 2. `tool_connections/grafana/connection-sso.md` (community recipe — fallback)

@@ -69,8 +69,8 @@ Fetch LLM/agent trace logs from Langfuse.
 
 **Reference files** — read your active copies first, fall back to the community recipes:
 - API key auth (preferred for structured queries):
-    1. `${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/langfuse/connection-api-key.md` (your active copy)
+    1. `${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/langfuse/connection-api-key.md` (your active copy)
     2. `tool_connections/langfuse/connection-api-key.md` (community recipe — fallback)
 - Browser session (for UI reads):
-    1. `${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/langfuse/connection-sso.md` (your active copy)
+    1. `${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/langfuse/connection-sso.md` (your active copy)
     2. `tool_connections/langfuse/connection-sso.md` (community recipe — fallback)

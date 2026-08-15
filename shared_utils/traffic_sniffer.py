@@ -27,8 +27,8 @@ Workflow:
   If the tool's connection file has a sniffer: block in its frontmatter,
   --tool <name> pre-fills --profile, --url, and --filter automatically.
   Connection file locations, in order:
-    $TENX_PRIVATE_DIR/personal/{tool}/connection-*.md
-    $TENX_PRIVATE_DIR/personal/tool_connections/{tool}/connection-*.md
+    $AUTO_PILOT_PRIVATE_DIR/personal/{tool}/connection-*.md
+    $AUTO_PILOT_PRIVATE_DIR/personal/tool_connections/{tool}/connection-*.md
     tool_connections/{tool}/connection-*.md
 
   Example frontmatter:
@@ -98,7 +98,7 @@ from pathlib import Path
 from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).parents[1]))
-from shared_utils.browser import AGENT_PROFILE_DIR, TENX_PRIVATE_DIR, sync_playwright
+from shared_utils.browser import AGENT_PROFILE_DIR, AUTO_PILOT_PRIVATE_DIR, sync_playwright
 
 _REPO_ROOT = Path(__file__).parents[1]
 
@@ -115,17 +115,17 @@ def _expand_path(value: str) -> Path:
 
 
 def _resolve_output_path(output_path: Optional[Path]) -> Optional[Path]:
-    """Map migrated repo-local personal outputs into TENX_PRIVATE_DIR."""
+    """Map migrated repo-local personal outputs into AUTO_PILOT_PRIVATE_DIR."""
     if output_path is None:
         return None
     if not output_path.is_absolute() and output_path.parts[:1] == ("personal",):
-        return TENX_PRIVATE_DIR.joinpath(*output_path.parts)
+        return AUTO_PILOT_PRIVATE_DIR.joinpath(*output_path.parts)
     try:
         relative_to_repo = output_path.resolve().relative_to(_REPO_ROOT)
     except ValueError:
         return output_path
     if relative_to_repo.parts[:1] == ("personal",):
-        return TENX_PRIVATE_DIR.joinpath(*relative_to_repo.parts)
+        return AUTO_PILOT_PRIVATE_DIR.joinpath(*relative_to_repo.parts)
     return output_path
 
 
@@ -137,8 +137,8 @@ def _load_tool_config(tool_name: str) -> dict:
     Raises FileNotFoundError if no connection file found for the tool.
     """
     candidate_dirs = [
-        TENX_PRIVATE_DIR / "personal" / tool_name,
-        TENX_PRIVATE_DIR / "personal" / "tool_connections" / tool_name,
+        AUTO_PILOT_PRIVATE_DIR / "personal" / tool_name,
+        AUTO_PILOT_PRIVATE_DIR / "personal" / "tool_connections" / tool_name,
         _REPO_ROOT / "tool_connections" / tool_name,
     ]
     candidates: list[Path] = []

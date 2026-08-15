@@ -155,9 +155,9 @@ Private runtime state lives outside the public repo by default:
   tmp/                    Trigger state, runtime sessions, scheduler state, reply logs
 ```
 
-Set `TENX_PRIVATE_DIR` if you want a different private directory. The repo keeps hooks and `.gitignore` as safety nets, but credentials and browser/session state should not live under the repo tree.
+Set `AUTO_PILOT_PRIVATE_DIR` if you want a different private directory. The repo keeps hooks and `.gitignore` as safety nets, but credentials and browser/session state should not live under the repo tree.
 
-Migration note: older local instructions may point at `/path/to/auto-pilot-agent/.env`, `/path/to/auto-pilot-agent/personal/`, or `/path/to/auto-pilot-agent/verified_connections.md`. Those now map to `TENX_PRIVATE_DIR/.env`, `TENX_PRIVATE_DIR/personal/`, and `TENX_PRIVATE_DIR/verified_connections.md`. The repo `personal/` folder is only a placeholder with this reminder.
+Migration note: older local instructions may point at `/path/to/auto-pilot-agent/.env`, `/path/to/auto-pilot-agent/personal/`, or `/path/to/auto-pilot-agent/verified_connections.md`. Those now map to `AUTO_PILOT_PRIVATE_DIR/.env`, `AUTO_PILOT_PRIVATE_DIR/personal/`, and `AUTO_PILOT_PRIVATE_DIR/verified_connections.md`. The repo `personal/` folder is only a placeholder with this reminder.
 
 The current repo is strongest at the connection layer. The trigger, runtime, and workflow layers now exist, but are still early. The next product direction is to harden enterprise-friendly triggers, promote more workflows, and make runtime execution reliable without requiring enterprise app installs or new infrastructure.
 

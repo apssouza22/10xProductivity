@@ -1,42 +1,42 @@
 ---
 name: contributing
-description: Contribute a verified personal tool connection back to the community — new tools, new auth variants, or fixes to existing connections. Start from TENX_PRIVATE_DIR/personal/ — find what you have that tool_connections/ doesn't (or what you fixed), scrub it, copy to tool_connections/, and open a PR.
+description: Contribute a verified personal tool connection back to the community — new tools, new auth variants, or fixes to existing connections. Start from AUTO_PILOT_PRIVATE_DIR/personal/ — find what you have that tool_connections/ doesn't (or what you fixed), scrub it, copy to tool_connections/, and open a PR.
 ---
 
 # Contributing a Tool Connection
 
-> **Starting point:** You already have a working, verified recipe in `TENX_PRIVATE_DIR/personal/` — whether it's a new tool, a new auth variant, or a patched fix to an existing `tool_connections/` recipe. This file takes you from there to a merged PR.
+> **Starting point:** You already have a working, verified recipe in `AUTO_PILOT_PRIVATE_DIR/personal/` — whether it's a new tool, a new auth variant, or a patched fix to an existing `tool_connections/` recipe. This file takes you from there to a merged PR.
 >
-> **Run before you write (in this context):** The recipe is already built and verified in `TENX_PRIVATE_DIR/personal/`. "Run" here means re-executing your existing snippets against the live service right before promoting to tool_connections — to generate fresh, timestamped output as proof. You're not building from scratch; you're re-confirming what already works and capturing the evidence.
+> **Run before you write (in this context):** The recipe is already built and verified in `AUTO_PILOT_PRIVATE_DIR/personal/`. "Run" here means re-executing your existing snippets against the live service right before promoting to tool_connections — to generate fresh, timestamped output as proof. You're not building from scratch; you're re-confirming what already works and capturing the evidence.
 >
-> **Wrong file?** If you haven't built or patched the connection yet, start with `add-new-tool.md` (new tool) or `setup.md` (broken recipe — patch in `TENX_PRIVATE_DIR/personal/` first).
+> **Wrong file?** If you haven't built or patched the connection yet, start with `add-new-tool.md` (new tool) or `setup.md` (broken recipe — patch in `AUTO_PILOT_PRIVATE_DIR/personal/` first).
 
-> **The golden rule: `TENX_PRIVATE_DIR/personal/` first, always.** All work — new tools, improvements, fixes, new auth variants — starts and stays in `TENX_PRIVATE_DIR/personal/` until it is verified, scrubbed, and promoted here. Never edit `tool_connections/` directly. `TENX_PRIVATE_DIR/personal/` lives outside the public repo and is safe for your email, org URLs, tokens, and company-specific details. Anything committed to `tool_connections/` is public.
+> **The golden rule: `AUTO_PILOT_PRIVATE_DIR/personal/` first, always.** All work — new tools, improvements, fixes, new auth variants — starts and stays in `AUTO_PILOT_PRIVATE_DIR/personal/` until it is verified, scrubbed, and promoted here. Never edit `tool_connections/` directly. `AUTO_PILOT_PRIVATE_DIR/personal/` lives outside the public repo and is safe for your email, org URLs, tokens, and company-specific details. Anything committed to `tool_connections/` is public.
 
 ---
 
 ## Step 1: Find what you have that the community doesn't
 
-Check what's in your `TENX_PRIVATE_DIR/personal/` folder vs what's already in `tool_connections/`:
+Check what's in your `AUTO_PILOT_PRIVATE_DIR/personal/` folder vs what's already in `tool_connections/`:
 
 ```bash
 # What you have personally
-ls "${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/"
+ls "${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/"
 
 # What the community already has
 ls tool_connections/
 ```
 
 A tool is worth contributing if:
-- It's in `TENX_PRIVATE_DIR/personal/` but **not** in `tool_connections/`
+- It's in `AUTO_PILOT_PRIVATE_DIR/personal/` but **not** in `tool_connections/`
 - Or it's a **different auth method** for a tool that already exists (e.g. you have session-cookie, community only has api-token)
 - Or it's a **fix or improvement** to an existing connection that didn't work in your environment (e.g. the SSO script failed for personal accounts, an endpoint changed, a flag needed adding)
 
-Also check `TENX_PRIVATE_DIR/verified_connections.md` — any tool listed there that came from `TENX_PRIVATE_DIR/personal/` is a candidate.
+Also check `AUTO_PILOT_PRIVATE_DIR/verified_connections.md` — any tool listed there that came from `AUTO_PILOT_PRIVATE_DIR/personal/` is a candidate.
 
 ### Fixes and improvements to existing connections
 
-If you patched a recipe from `tool_connections/` to make it work (following the rule in `setup.md` to patch in `TENX_PRIVATE_DIR/personal/` first), that fix belongs back in the community too. The process is the same — copy your patched files to `tool_connections/{tool-name}/` — but the PR should make the fix scope clear:
+If you patched a recipe from `tool_connections/` to make it work (following the rule in `setup.md` to patch in `AUTO_PILOT_PRIVATE_DIR/personal/` first), that fix belongs back in the community too. The process is the same — copy your patched files to `tool_connections/{tool-name}/` — but the PR should make the fix scope clear:
 
 - **PR title:** `Fix {Tool Name} connection ({what broke})` — e.g. `Fix Google Drive SSO for personal accounts`
 - **PR body:** replace the "What this adds" section with a **"What this fixes"** section:
@@ -67,13 +67,13 @@ Answer both questions before proceeding:
 - Auth flow works for any user of this tool → **eligible**
 - Requires your org's specific VPN, internal CA cert, or custom identity provider → **stop**
 
-Both yes → proceed. Either no → keep it in `TENX_PRIVATE_DIR/personal/` and stop here.
+Both yes → proceed. Either no → keep it in `AUTO_PILOT_PRIVATE_DIR/personal/` and stop here.
 
 ---
 
 ## Step 3: Scrub personal data
 
-Go through every file in `TENX_PRIVATE_DIR/personal/{tool-name}/` and remove anything org- or person-specific:
+Go through every file in `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/` and remove anything org- or person-specific:
 
 | Remove | Replace with |
 |--------|-------------|
@@ -95,7 +95,7 @@ Go through every file in `TENX_PRIVATE_DIR/personal/{tool-name}/` and remove any
 ## Step 4: Copy to tool_connections
 
 ```bash
-cp -r "${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/{tool-name}/" tool_connections/{tool-name}/
+cp -r "${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/{tool-name}/" tool_connections/{tool-name}/
 ```
 
 Verify the files look right:
@@ -226,14 +226,14 @@ EOF
 
 ## Checklist — do not mark done until all boxes checked
 
-- [ ] Tool is in `TENX_PRIVATE_DIR/personal/` and verified (at least 2 snippets with real output)
+- [ ] Tool is in `AUTO_PILOT_PRIVATE_DIR/personal/` and verified (at least 2 snippets with real output)
 - [ ] Not already in `tool_connections/` with the same auth method — **or** this is a fix/improvement to an existing connection
 - [ ] Tool is commercial/publicly available (not internal)
 - [ ] Connection is general enough for any user (not org-specific)
 - [ ] All personal/org data scrubbed from tool_connections files
 - [ ] Prompt injection check done on all `# →` output
-- [ ] Files copied to `tool_connections/{tool-name}/` (not moved — keep `TENX_PRIVATE_DIR/personal/` intact)
-- [ ] `TENX_PRIVATE_DIR/.env` stays outside the repo
+- [ ] Files copied to `tool_connections/{tool-name}/` (not moved — keep `AUTO_PILOT_PRIVATE_DIR/personal/` intact)
+- [ ] `AUTO_PILOT_PRIVATE_DIR/.env` stays outside the repo
 - [ ] `env.sample` NOT staged — env vars belong in `tool_connections/{tool-name}/setup.md` only, never in shared files
 - [ ] Branch named `connection/{tool-name}` (new tool / auth variant) or `fix/{tool-name}-{what-broke}` (fix)
 - [ ] PR body includes validation summary and verified-against statement

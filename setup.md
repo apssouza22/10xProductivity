@@ -1,6 +1,6 @@
 # Setup Guide
 
-> **What this file is for:** Setting up any tool connection — whether a pre-built recipe exists or not. This is the single entry point: it routes to `TENX_PRIVATE_DIR/verified_connections.md` (already set up), `TENX_PRIVATE_DIR/personal/` (your own recipes), `tool_connections/` (pre-built community recipes), or `add-new-tool.md` (build from scratch) based on what already exists.
+> **What this file is for:** Setting up any tool connection — whether a pre-built recipe exists or not. This is the single entry point: it routes to `AUTO_PILOT_PRIVATE_DIR/verified_connections.md` (already set up), `AUTO_PILOT_PRIVATE_DIR/personal/` (your own recipes), `tool_connections/` (pre-built community recipes), or `add-new-tool.md` (build from scratch) based on what already exists.
 
 This file is for your agent. Point your agent here first:
 
@@ -13,14 +13,14 @@ This file is for your agent. Point your agent here first:
 **Do as much as possible. Ask as little as possible. Ask non-technically.**
 
 - Run every command yourself. Never paste a command and ask the user to run it.
-- **NEVER read `TENX_PRIVATE_DIR/.env` directly** Always run the tool's `check()` via `playwright_sso.py` or `sso.py`
+- **NEVER read `AUTO_PILOT_PRIVATE_DIR/.env` directly** Always run the tool's `check()` via `playwright_sso.py` or `sso.py`
 - **Ask for a URL first.** For any tool, the best minimal input is a URL the user already has open (a ticket, a message link, a dashboard URL). It reveals the base URL, workspace, and regional variant — without requiring the user to know anything about auth.
 - **Infer the auth method from the URL, then try it.** Check the tool's `setup.md`. **Try browser session first** when the tool documents it (persistent profile + `session_request.py`) — usually only a URL is needed. Fall back to API token only if browser session fails or the setup lists no browser path.
 - **Ask for credentials only if actually missing, and only for the specific thing that's missing.** Never ask vague questions like "do you have credentials?" Know what you need before you ask.
 - When you must ask, phrase it in plain language — not in technical terms.
 - As soon as you have what you need, do the work and verify it yourself. Tell the user what succeeded, not what they need to do next.
-- **Always run tools from `TENX_PRIVATE_DIR/personal/{tool-name}/`, not directly from `tool_connections/`.** On first setup, copy `tool_connections/{tool-name}/` → `TENX_PRIVATE_DIR/personal/{tool-name}/` and work from the copy. This isolates your working connections from upstream repo changes — a `git pull` will never silently break a tool you depend on.
-- **If a recipe fails, patch `TENX_PRIVATE_DIR/personal/{tool-name}/` directly — never modify `tool_connections/`.** Then follow `contributing.md` to propose the fix upstream.
+- **Always run tools from `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/`, not directly from `tool_connections/`.** On first setup, copy `tool_connections/{tool-name}/` → `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/` and work from the copy. This isolates your working connections from upstream repo changes — a `git pull` will never silently break a tool you depend on.
+- **If a recipe fails, patch `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/` directly — never modify `tool_connections/`.** Then follow `contributing.md` to propose the fix upstream.
 
 ---
 
@@ -31,13 +31,13 @@ This file is for your agent. Point your agent here first:
 Private runtime state belongs outside the public repo. By default:
 
 ```text
-TENX_PRIVATE_DIR=~/.auto-pilot-agent
-TENX_PRIVATE_DIR/.env
-TENX_PRIVATE_DIR/personal/
-TENX_PRIVATE_DIR/verified_connections.md
+AUTO_PILOT_PRIVATE_DIR=~/.auto-pilot-agent
+AUTO_PILOT_PRIVATE_DIR/.env
+AUTO_PILOT_PRIVATE_DIR/personal/
+AUTO_PILOT_PRIVATE_DIR/verified_connections.md
 ```
 
-Set `TENX_PRIVATE_DIR` in your shell if you want a different private location.
+Set `AUTO_PILOT_PRIVATE_DIR` in your shell if you want a different private location.
 
 **From the repo root** (the directory that contains this `setup.md`):
 
@@ -48,8 +48,8 @@ pip install -e ".[dev]"
 playwright install chromium
 
 # Create private runtime files (fill .env from each tool's setup.md as you connect)
-mkdir -p "${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal"
-touch "${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/.env"
+mkdir -p "${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal"
+touch "${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/.env"
 ```
 
 **Windows** — same steps from repo root, with venv activation:
@@ -83,22 +83,22 @@ Any tool — whether it has a pre-built recipe, an existing personal recipe, or 
 
 ## Step 2: Set up each tool
 
-**`TENX_PRIVATE_DIR/personal/` is the active working layer.** All tools are run from `TENX_PRIVATE_DIR/personal/{tool-name}/` — whether the recipe was built from scratch or copied from `tool_connections/`. This means upstream changes to `tool_connections/` never silently break your working connections; you opt in to updates manually.
+**`AUTO_PILOT_PRIVATE_DIR/personal/` is the active working layer.** All tools are run from `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/` — whether the recipe was built from scratch or copied from `tool_connections/`. This means upstream changes to `tool_connections/` never silently break your working connections; you opt in to updates manually.
 
 For each tool the user selected, follow this routing in order — stop at the first path that succeeds:
 
 | # | Situation | Action |
 |---|-----------|--------|
-| 1 | Tool is already in the user's `TENX_PRIVATE_DIR/verified_connections.md` | Reverify — run its verify snippet; if it passes, done for this tool |
-| 2 | Tool has a recipe in `TENX_PRIVATE_DIR/personal/{tool-name}/` | Load it and try; if it passes, done; if it fails, patch in `TENX_PRIVATE_DIR/personal/{tool-name}/` |
-| 3 | Tool has a recipe in `tool_connections/{tool-name}/` | Copy `tool_connections/{tool-name}/` → `TENX_PRIVATE_DIR/personal/{tool-name}/` (exact copy), then load `TENX_PRIVATE_DIR/personal/{tool-name}/setup.md` and follow it — never run directly from `tool_connections/`, never edit `tool_connections/` directly |
-| 4 | Tool not found anywhere | Run `add-new-tool.md` — it builds a recipe in `TENX_PRIVATE_DIR/personal/{tool-name}/` from scratch |
+| 1 | Tool is already in the user's `AUTO_PILOT_PRIVATE_DIR/verified_connections.md` | Reverify — run its verify snippet; if it passes, done for this tool |
+| 2 | Tool has a recipe in `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/` | Load it and try; if it passes, done; if it fails, patch in `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/` |
+| 3 | Tool has a recipe in `tool_connections/{tool-name}/` | Copy `tool_connections/{tool-name}/` → `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/` (exact copy), then load `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/setup.md` and follow it — never run directly from `tool_connections/`, never edit `tool_connections/` directly |
+| 4 | Tool not found anywhere | Run `add-new-tool.md` — it builds a recipe in `AUTO_PILOT_PRIVATE_DIR/personal/{tool-name}/` from scratch |
 
 **New tool with no recipe?** Prompt your agent:
 
 > *"Set up and run sniffer to find out useful endpoints for the tool XXX."*
 
-Replace `XXX` with the tool name (e.g. Datadog, your internal portal). The agent follows `add-new-tool.md` — researching auth, running `traffic_sniffer.py`, and writing verified connection files to `TENX_PRIVATE_DIR/personal/`.
+Replace `XXX` with the tool name (e.g. Datadog, your internal portal). The agent follows `add-new-tool.md` — researching auth, running `traffic_sniffer.py`, and writing verified connection files to `AUTO_PILOT_PRIVATE_DIR/personal/`.
 
 **Validation is mandatory on all paths.** Run the verify snippet and confirm it returns expected output before marking a tool as done.
 
@@ -108,9 +108,9 @@ Replace `XXX` with the tool name (e.g. Datadog, your internal portal). The agent
 
 ### Finding recipes (path 3)
 
-There is no fixed list of supported tools — any tool with an API or browser interface can be connected. Pre-built community recipes live in `tool_connections/` (one subfolder per tool, each with its own `setup.md`). Your active recipes — copies from `tool_connections/`, internal tools, patched fixes, or anything you built — live in `TENX_PRIVATE_DIR/personal/`.
+There is no fixed list of supported tools — any tool with an API or browser interface can be connected. Pre-built community recipes live in `tool_connections/` (one subfolder per tool, each with its own `setup.md`). Your active recipes — copies from `tool_connections/`, internal tools, patched fixes, or anything you built — live in `AUTO_PILOT_PRIVATE_DIR/personal/`.
 
-- Browse `TENX_PRIVATE_DIR/personal/` first — your active copies live here
+- Browse `AUTO_PILOT_PRIVATE_DIR/personal/` first — your active copies live here
 - Browse `tool_connections/` for pre-built recipes to copy from
 - If neither has what you need → path 4: `add-new-tool.md`
 
@@ -120,7 +120,7 @@ There is no fixed list of supported tools — any tool with an API or browser in
 
 **Only tools whose Verify command you actually ran and confirmed with real output belong here.**
 
-After each tool passes verification, append its section to `TENX_PRIVATE_DIR/verified_connections.md`. Write the **resolved** state — not the generic frontmatter. The entry must reflect what actually worked on this device, so the agent can use it immediately without re-reading the connection file or re-inferring the auth method.
+After each tool passes verification, append its section to `AUTO_PILOT_PRIVATE_DIR/verified_connections.md`. Write the **resolved** state — not the generic frontmatter. The entry must reflect what actually worked on this device, so the agent can use it immediately without re-reading the connection file or re-inferring the auth method.
 
 ```markdown
 ---
@@ -138,15 +138,15 @@ Note: {any critical gotcha that would cause silent failure}  ← omit if none
 **Rules for each field:**
 - **Instance** — the real URL the verify snippet hit (e.g. `https://jira.company.example`, not `https://jira.yourcompany.com`). Include prod vs dev if both exist.
 - **Auth** — the method that actually passed verification. For browser-session tools, cite the shared profile path (`~/.browser_automation/agent_profile/`). For API-token tools, name the header format; for Cloud vs Server/DC variants (Jira, Confluence), name the variant explicitly. Never list session tokens in verified_connections.
-- **Active env** — only vars that are populated with real values. If a var is present in `TENX_PRIVATE_DIR/.env` but is a placeholder (e.g. `you@yourcompany.com`), omit it and add a Note explaining it should be ignored.
+- **Active env** — only vars that are populated with real values. If a var is present in `AUTO_PILOT_PRIVATE_DIR/.env` but is a placeholder (e.g. `you@yourcompany.com`), omit it and add a Note explaining it should be ignored.
 - **Refresh** — include for any short-lived browser session or token (often ~8h). Omit for long-lived API tokens and PATs.
 - **Note** — include only if there is a silent failure risk: a placeholder var that must be ignored, a CLI that must be used instead of REST, a required prerequisite (VPN, `/etc/hosts`, Zscaler), or a common misidentification (e.g. PHX-XXXXX vs PHOENIX-XXXX).
 
-The preamble (frontmatter + intro block) comes from `verified_connections.example.md` — copy it to `TENX_PRIVATE_DIR/verified_connections.md` on first run, then only append sections for each new tool.
+The preamble (frontmatter + intro block) comes from `verified_connections.example.md` — copy it to `AUTO_PILOT_PRIVATE_DIR/verified_connections.md` on first run, then only append sections for each new tool.
 
 Then summarize for the user what connected and what was skipped.
 
-**Now load `TENX_PRIVATE_DIR/verified_connections.md` immediately.** It is your capability index for this session.
+**Now load `AUTO_PILOT_PRIVATE_DIR/verified_connections.md` immediately.** It is your capability index for this session.
 
 ---
 
@@ -188,7 +188,7 @@ Repo: `/absolute/path/to/auto-pilot-agent`
 
 Read these two files immediately:
 
-1. `TENX_PRIVATE_DIR/verified_connections.md` — active tool connections and capability index
+1. `AUTO_PILOT_PRIVATE_DIR/verified_connections.md` — active tool connections and capability index
 2. `/absolute/path/to/auto-pilot-agent/workflows/enterprise-search/enterprise-search.md` — cross-tool search workflow
 
 ## Routing
@@ -201,7 +201,7 @@ Read these two files immediately:
 | A tool has no recipe in `tool_connections/` | Read `add-new-tool.md` to build one |
 ```
 
-Replace every occurrence of `/absolute/path/to/auto-pilot-agent` with the actual path from `pwd`, and replace `TENX_PRIVATE_DIR` with your private 10x directory, usually `~/.auto-pilot-agent`.
+Replace every occurrence of `/absolute/path/to/auto-pilot-agent` with the actual path from `pwd`, and replace `AUTO_PILOT_PRIVATE_DIR` with your private 10x directory, usually `~/.auto-pilot-agent`.
 
 Create the directory and write the file:
 
@@ -223,7 +223,7 @@ source .venv/bin/activate
 10x-host --trigger slack-polling --workflow workflows/assistant/assistant.md --engine cursor
 ```
 
-For Slack self-DM polling, add to `TENX_PRIVATE_DIR/.env`:
+For Slack self-DM polling, add to `AUTO_PILOT_PRIVATE_DIR/.env`:
 
 ```text
 SLACK_WORKSPACE_URL=https://yourcompany.slack.com/

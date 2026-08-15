@@ -18,8 +18,8 @@ Search and fetch runbook pages from Confluence.
 
 **Reference files** — read your active copies first, fall back to the community recipes:
 - Browser session (preferred, no API token):
-  1. `${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/confluence/connection-sso.md` (your active copy)
+  1. `${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/confluence/connection-sso.md` (your active copy)
   2. `tool_connections/confluence/connection-sso.md` (community recipe — fallback)
 - API token auth:
-  1. `${TENX_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/confluence/connection-api-token.md` (your active copy)
+  1. `${AUTO_PILOT_PRIVATE_DIR:-$HOME/.auto-pilot-agent}/personal/confluence/connection-api-token.md` (your active copy)
   2. `tool_connections/confluence/connection-api-token.md` (community recipe — fallback)
