@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Cursor beforeShellExecution hook — blocks git commits containing company-related content.
+# Claude Code PreToolUse hook (matcher: Bash) — blocks git commits containing
+# company-related content.
 #
 # Checks:
 #   1. Author identity (git config user.email / user.name)
@@ -8,8 +9,12 @@
 #
 # The banned term is loaded from .env (gitignored) so it never appears as a
 # literal in any committed file.
+#
+# stdin  (Claude Code PreToolUse): {"tool_name":"Bash","tool_input":{"command":"..."}}
+# stdout (deny):  {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"..."}}
+# stdout (allow): (nothing — exit 0)
 
-REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo ".")
+REPO_ROOT=$(python3 "$(dirname "$0")/project_root.py")
 ENV_FILE="$REPO_ROOT/.env"
 
 # Load BANNED_TERM from .env
@@ -20,15 +25,13 @@ fi
 
 # Nothing to check if no banned term configured
 if [[ -z "$BANNED_TERM" ]]; then
-    echo '{ "permission": "allow" }'
     exit 0
 fi
 
 input=$(cat)
-command=$(echo "$input" | jq -r '.command // empty')
+command=$(echo "$input" | jq -r '.tool_input.command // empty')
 
 if ! echo "$command" | grep -qE 'git (commit|merge|rebase|cherry-pick|am)'; then
-    echo '{ "permission": "allow" }'
     exit 0
 fi
 
@@ -46,7 +49,11 @@ fi
 
 # ── Check 2: Commit message (-m value) ───────────────────────────────────────
 # Extract the value after -m (handles: -m "msg", -m 'msg', -m msg)
-commit_msg=$(echo "$command" | grep -oP '(?<=-m\s)["\x27]?\K[^"'\'']+' | head -1 || true)
+# Portable across macOS (BSD sed) and Linux (GNU sed): use sed, not grep -P.
+commit_msg=$(echo "$command" | sed -n 's/.*-m[[:space:]]*"\([^"]*\)".*/\1/p' | head -1 || true)
+if [[ -z "$commit_msg" ]]; then
+    commit_msg=$(echo "$command" | sed -n "s/.*-m[[:space:]]*'\\([^']*\\)'.*/\\1/p" | head -1 || true)
+fi
 if [[ -z "$commit_msg" ]]; then
     # Try heredoc/process substitution pattern: look for content after -m "$(
     commit_msg=$(echo "$command" | sed -n 's/.*-m[[:space:]]*"\$([^)]*)\(.*\)"/\1/p' | head -1 || true)
@@ -75,13 +82,17 @@ fi
 if [[ $FAIL -eq 1 ]]; then
     summary=$(printf '%s\n' "${MESSAGES[@]}")
     safe_summary=$(echo "$summary" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read().strip()))")
-    echo "{
-      \"permission\": \"block\",
-      \"user_message\": \"Commit blocked: company-related content detected.\\n\\n$summary\",
-      \"agent_message\": \"Commit blocked by pre-commit hook. Issues found: $safe_summary\"
-    }"
+    python3 -c "
+import json, sys
+print(json.dumps({
+    'hookSpecificOutput': {
+        'hookEventName': 'PreToolUse',
+        'permissionDecision': 'deny',
+        'permissionDecisionReason': 'Commit blocked: company-related content detected.' + chr(10) + chr(10) + $safe_summary,
+    }
+}))
+"
     exit 0
 fi
 
-echo '{ "permission": "allow" }'
 exit 0
