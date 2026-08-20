@@ -2,10 +2,12 @@
 
 **A local-first stack for building a personal AI assistant to assist you in your daily work.**
 
-Use the coding agents, browser sessions, desktop apps and tool access you already have. 
+Use the coding agents, browser sessions, desktop apps and tool access you already have.
 No new company-wide automation platform, no admin-approved Slack app, no webhooks, and no IT project required.
 
 If this saves you time, consider giving it a star. It helps others discover the project.
+
+📖 **[Read the full article](ARTICLE.md)**: Building Personal AI Assistants for Work - a deep dive into leveraging AI coding assistants, Playwright-based browser sessions, and specialized agents to build sophisticated personal work assistants.
 
 ## The Idea
 
@@ -82,7 +84,7 @@ Replace `XXX` with the tool name. See [`add-new-tool.md`](add-new-tool.md).
 
 ## Example Workflows and Prompts
 
-**Available today: enterprise search**
+**Enterprise search**
 
 ```text
 Search for everything related to the decision to deprecate the v1 API.

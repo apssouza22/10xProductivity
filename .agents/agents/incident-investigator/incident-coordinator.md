@@ -55,7 +55,7 @@ On top of the brief and the delegation's specific question:
 
 ## Delegation mechanics
 
-See @rules/coordinator-scratchpad.md for the Structured Finding Brief, step lifecycle, scratchpad paths, and task-prompt template. 
+See @.agents/rules/coordinator-scratchpad.md for the Structured Finding Brief, step lifecycle, scratchpad paths, and task-prompt template. 
 Incident specifics on top of that rule:
 
 - `/investigate-incident` supplies `investigation_id` and `runs/<investigation_id>/scratchpad/`. If either is missing, mint

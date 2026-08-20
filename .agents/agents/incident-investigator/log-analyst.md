@@ -51,7 +51,7 @@ and note whether they corroborate or diverge from the reported symptom.
 
 ## Scratchpad
 
-See @rules/subagent-scratchpad.md.
+See @.agents/rules/subagent-scratchpad.md.
 
 ## Rules
 - Read-only only. Never click Edit, Save, Delete, or any other mutating action in the Discover UI.

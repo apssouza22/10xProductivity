@@ -25,7 +25,7 @@ If your task prompt gives you a specific time window, service scoping, or other 
 
 ## Scratchpad
 
-See @rules/subagent-scratchpad.md.
+See @.agents/rules/subagent-scratchpad.md.
 
 
 ## Connected tool: Grafana
