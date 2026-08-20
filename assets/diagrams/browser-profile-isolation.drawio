@@ -1,0 +1,40 @@
+<mxfile host="app.diagrams.net" modified="2026-08-20T12:00:00.000Z" agent="Cursor" version="24.7.17" type="device">
+  <diagram id="browser-isolation" name="Browser Isolation">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1200" pageHeight="740" math="0" shadow="0" defaultFontFamily="Noto Sans JP">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="t" value="Browser Profile Isolation" style="text;html=1;fontSize=28;fontStyle=1;fontFamily=Noto Sans JP;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="700" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="m" value="Personal browser data is never accessible to the agent" style="text;html=1;fontSize=14;fontColor=#666666;fontFamily=Noto Sans JP;strokeColor=none;fillColor=none;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="68" width="700" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="laptop" value="Your Laptop" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontSize=18;fontStyle=1;fontFamily=Noto Sans JP;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="1120" height="580" as="geometry"/>
+        </mxCell>
+        <mxCell id="personal" value="Your Personal Browser (Chrome/Firefox/Safari)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;fontSize=18;fontStyle=1;fontFamily=Noto Sans JP;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="170" width="480" height="220" as="geometry"/>
+        </mxCell>
+        <mxCell id="pdata" value="Personal Data (NEVER accessible to agent)&lt;br&gt;&lt;font style=&quot;font-size:13px;&quot;&gt;Gmail • Amazon • Banking • Facebook • Passwords • History&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;strokeWidth=2;fontSize=14;fontFamily=Noto Sans JP;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="110" y="220" width="420" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="iso" value="⬇ ISOLATED ⬇&lt;br&gt;No shared cookies • storage • sessions" style="text;html=1;fontStyle=1;fontSize=14;fontFamily=Noto Sans JP;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="520" y="260" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="agent" value="Agent Browser (Playwright Chromium)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=18;fontStyle=1;fontFamily=Noto Sans JP;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="620" y="170" width="480" height="220" as="geometry"/>
+        </mxCell>
+        <mxCell id="wdata" value="Work Tool Sessions ONLY&lt;br&gt;&lt;font style=&quot;font-size:13px;&quot;&gt;Slack • Jira • GitHub • Grafana • Confluence&lt;br&gt;NO personal cookies or passwords&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;strokeWidth=2;fontSize=14;fontFamily=Noto Sans JP;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="650" y="220" width="420" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="note" value="Agent NEVER sees personal browser data. You sign into work tools in the agent browser." style="text;html=1;fontSize=16;fontFamily=Noto Sans JP;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="80" y="430" width="1000" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="revoke" value="Revoke all access: rm -rf ~/.browser_automation/agent_profile/" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=15;fontFamily=Noto Sans JP;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="280" y="520" width="640" height="50" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

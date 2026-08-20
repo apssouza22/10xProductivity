@@ -2,42 +2,9 @@
 
 ## Overview
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    The Auto Pilot Agent Vision                       │
-│                                                                      │
-│  Traditional Approach           │  Auto Pilot Agent                 │
-│  ─────────────────────          │  ─────────────────                │
-│                                 │                                    │
-│  ┌──────────────────┐          │  ┌──────────────────┐             │
-│  │  Install new     │          │  │  Use your        │             │
-│  │  platform        │          │  │  coding agent    │             │
-│  │  • IT approval   │          │  │  • Already have  │             │
-│  │  • Weeks/months  │          │  │  • Works today   │             │
-│  └──────────────────┘          │  └──────────────────┘             │
-│           ↓                     │           ↓                        │
-│  ┌──────────────────┐          │  ┌──────────────────┐             │
-│  │  Register OAuth  │          │  │  Sign in via     │             │
-│  │  apps for each   │          │  │  browser (once)  │             │
-│  │  tool            │          │  │  • Session saved │             │
-│  │  • Admin needed  │          │  │  • No OAuth      │             │
-│  └──────────────────┘          │  └──────────────────┘             │
-│           ↓                     │           ↓                        │
-│  ┌──────────────────┐          │  ┌──────────────────┐             │
-│  │  Cloud middleware│          │  │  Local-first     │             │
-│  │  • Vendor lock   │          │  │  • Your machine  │             │
-│  │  • Data leaves   │          │  │  • Your data     │             │
-│  └──────────────────┘          │  └──────────────────┘             │
-│           ↓                     │           ↓                        │
-│  ┌──────────────────┐          │  ┌──────────────────┐             │
-│  │  Read-only       │          │  │  Read+Write+Act  │             │
-│  │  • Find info     │          │  │  • Find info     │             │
-│  │  • You act       │          │  │  • Agent acts    │             │
-│  └──────────────────┘          │  └──────────────────┘             │
-│                                 │                                    │
-│  Time to value: Weeks/Never    │  Time to value: 5 minutes         │
-└─────────────────────────────────────────────────────────────────────┘
-```
+![The Auto Pilot Agent Vision — traditional automation vs local-first personal assistants](assets/diagrams/auto-pilot-vision.drawio.png)
+
+*Editable source: [auto-pilot-vision.drawio](assets/diagrams/auto-pilot-vision.drawio)*
 
 **What this enables:**
 - ✅ Connect any tool (Slack, Jira, GitHub, Grafana, internal portals)
@@ -74,7 +41,7 @@
 
 ## The Evolution from Coding Assistant to Personal Work Assistant
 
-The Auto Pilot Agent project represents a paradigm shift in how we think about AI coding assistants. While tools like Cursor, Claude Code, Codex, and GitHub Copilot started as coding companions, they have evolved into something far more powerful: **general-purpose automation platforms that can interact with any tool on your laptop**.
+The Auto Pilot Agent project represents a paradigm shift in how we think about AI coding assistants. While tools like Cursor, Claude Code and Codex started as coding companions, they have evolved into something far more powerful: **general-purpose automation platforms that can interact with any tool on your laptop**.
 
 This article explores how we're leveraging modern AI coding assistants to build sophisticated personal work assistants—without requiring company-wide platform rollouts, admin approvals, or new infrastructure.
 
@@ -105,114 +72,19 @@ The key insight: **Coding agents can already read files, run scripts, call APIs,
 
 The Auto Pilot Agent architecture consists of two layers that work together to enable sophisticated personal work automation:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│              Layer 2: Specialized Agent Layer                    │
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Coordinator Agent (Orchestration)                       │   │
-│  │  • Decomposes complex tasks                             │   │
-│  │  • Delegates to specialist agents                       │   │
-│  │  • Aggregates results                                   │   │
-│  └────────────┬─────────────────────────────────────────────┘   │
-│               │                                                  │
-│               ├─ delegates to ──┐                                │
-│               │                 │                                │
-│  ┌────────────▼─────┐  ┌───────▼──────┐  ┌────────▼──────┐     │
-│  │  Specialist      │  │  Specialist  │  │  Specialist   │     │
-│  │  Agent 1         │  │  Agent 2     │  │  Agent 3      │     │
-│  │                  │  │              │  │               │     │
-│  │  • Focused task  │  │  • Focused   │  │  • Focused    │     │
-│  │  • Scoped tools  │  │    task      │  │    task       │     │
-│  │  • Isolated ctx  │  │  • Scoped    │  │  • Scoped     │     │
-│  └──────────────────┘  │    tools     │  │    tools      │     │
-│                        └──────────────┘  └───────────────┘     │
-│                                                                  │
-│  All agents share:                                               │
-│  • Same tool connection layer                                    │
-│  • Same browser session infrastructure                           │
-│  • Same authentication context                                   │
-└───────────────────────────┬──────────────────────────────────────┘
-                            ↓ all agents use
-┌─────────────────────────────────────────────────────────────────┐
-│          Layer 1: Shared Infrastructure (Tool + Auth)            │
-│                                                                  │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │  Tool Connection Layer                                  │    │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────┐  │    │
-│  │  │  Slack   │  │   Jira   │  │ GitHub   │  │Grafana │  │    │
-│  │  │connector │  │connector │  │connector │  │connector│  │    │
-│  │  └──────────┘  └──────────┘  └──────────┘  └────────┘  │    │
-│  └─────────────────────────────────────────────────────────┘    │
-│                            ↓ authenticates via                   │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │  Browser Session Infrastructure                         │    │
-│  │                                                          │    │
-│  │  ┌────────────────────────────────────────────────┐     │    │
-│  │  │  Persistent Browser Profile (Shared)           │     │    │
-│  │  │  ~/.browser_automation/agent_profile/          │     │    │
-│  │  │  • Session cookies  • Auth tokens  • CSRF      │     │    │
-│  │  └────────────────────────────────────────────────┘     │    │
-│  │                    ↑                                     │    │
-│  │                    │ managed by                          │    │
-│  │  ┌─────────────────┴───────────────────────────────┐    │    │
-│  │  │  Playwright Wrapper Layer (Python)              │    │    │
-│  │  │                                                  │    │    │
-│  │  │  ┌──────────┐  ┌───────────┐  ┌─────────────┐  │    │    │
-│  │  │  │ session_ │  │playwright_│  │ traffic_    │  │    │    │
-│  │  │  │request.py│  │  sso.py   │  │ sniffer.py  │  │    │    │
-│  │  │  └──────────┘  └───────────┘  └─────────────┘  │    │    │
-│  │  └──────────────────┬──────────────────────────────┘    │    │
-│  │                     │ uses                               │    │
-│  │                     ↓                                     │    │
-│  │  ┌──────────────────────────────────────────────────┐    │    │
-│  │  │  Playwright (via CLI/Python SDK)                 │    │    │
-│  │  │  • Chromium browser automation                   │    │    │
-│  │  │  • Persistent context (shared by all agents)     │    │    │
-│  │  │  • Network interception                          │    │    │
-│  │  └──────────────────────────────────────────────────┘    │    │
-│  └─────────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────┘
-```
+![Two-layer architecture — specialized agents on shared tool and browser infrastructure](assets/diagrams/two-layer-architecture.drawio.png)
+
+*Editable source: [two-layer-architecture.drawio](assets/diagrams/two-layer-architecture.drawio)*
 
 ### Layer 1: Shared Infrastructure - Tool Connections & Browser Sessions
 
 The foundation is a novel approach to tool integration that prioritizes **zero-friction setup** over architectural purity.
 
 **The Stack**:
-```
-┌──────────────────────────────────────────────────┐
-│  Python Wrapper Layer                            │
-│  • session_request.py - authenticated API calls  │
-│  • playwright_sso.py - auth & profile mgmt       │
-│  • traffic_sniffer.py - API discovery            │
-│  • browser.py - shared utilities                 │
-└────────────────────┬─────────────────────────────┘
-                     │ imports & calls
-                     ↓
-┌──────────────────────────────────────────────────┐
-│  Playwright Python SDK                           │
-│  • Browser automation library                    │
-│  • Installed via: pip install playwright         │
-│  • API: sync_playwright(), launch_persistent...  │
-└────────────────────┬─────────────────────────────┘
-                     │ manages
-                     ↓
-┌──────────────────────────────────────────────────┐
-│  Playwright CLI (installed browsers)             │
-│  • Installed via: playwright install chromium    │
-│  • Browser binaries: ~/.cache/ms-playwright/     │
-│  • Chromium, Firefox, WebKit                     │
-└────────────────────┬─────────────────────────────┘
-                     │ launches & controls
-                     ↓
-┌──────────────────────────────────────────────────┐
-│  Chromium Browser (persistent profile)           │
-│  • Profile: ~/.browser_automation/agent_profile/ │
-│  • Stores: cookies, local storage, sessions      │
-│  • Survives restarts, shared across calls        │
-└──────────────────────────────────────────────────┘
-```
+
+![Browser session stack — Python wrappers through Playwright to persistent Chromium profile](assets/diagrams/browser-stack.drawio.png)
+
+*Editable source: [browser-stack.drawio](assets/diagrams/browser-stack.drawio)*
 
 #### The Browser Session Innovation
 
@@ -224,30 +96,9 @@ Traditional API integrations require:
 
 Our approach uses **persistent browser sessions** as the universal authentication mechanism:
 
-```
-Traditional Approach                 Auto Pilot Agent Approach
-══════════════════                   ═══════════════════════════
+![Authentication comparison — OAuth setup vs browser session sign-in](assets/diagrams/auth-comparison.drawio.png)
 
-User                                 User
- │                                    │
- ├─ Create OAuth App                  ├─ Sign in via browser (once)
- ├─ Register Redirect URIs            │   └─ Session saved to profile
- ├─ Get Client ID/Secret              │
- ├─ Configure Scopes                  │
- ├─ Generate Access Token             │
- ├─ Manage Token Refresh              │
- └─ Handle Multiple Environments      │
-                                      │
-High Friction                        │
-Multiple Steps                       │
-Requires Technical Knowledge         └─ Agent uses session
-                                         ├─ Auto-extracts cookies
-                                         ├─ Auto-handles CSRF
-                                         └─ Works across all tools
-
-Setup Time: 10-30 minutes            Setup Time: 30 seconds
-Expertise: OAuth, APIs               Expertise: Can you log in?
-```
+*Editable source: [auth-comparison.drawio](assets/diagrams/auth-comparison.drawio)*
 
 ```python
 from shared_utils.session_request import tool_request
@@ -269,101 +120,9 @@ Behind the scenes, this:
 
 When official API documentation is incomplete or endpoints aren't publicly documented, we use a traffic sniffer:
 
-```
-Traffic Sniffer Flow (Playwright-based)
-═══════════════════════════════════════
+![Traffic sniffer flow — Playwright-based API discovery from browser interactions](assets/diagrams/traffic-sniffer-flow.drawio.png)
 
-┌──────────────────────────────────────┐
-│  1. Agent/User runs sniffer          │
-│                                       │
-│  $ python3 traffic_sniffer.py \      │
-│      --tool slack                     │
-└──────────┬───────────────────────────┘
-           │
-           ↓ (Python script imports Playwright SDK)
-┌──────────────────────────────────────────────────────┐
-│  2. traffic_sniffer.py                               │
-│                                                       │
-│  from playwright.sync_api import sync_playwright     │
-│                                                       │
-│  • Reads tool config from connection-*.md            │
-│  • Gets profile: ~/.browser_automation/agent_profile│
-│  • Gets warmup URL: https://app.slack.com            │
-│  • Gets filter: /api                                 │
-└──────────┬───────────────────────────────────────────┘
-           │
-           ↓ (calls Playwright to launch browser)
-┌──────────────────────────────────────────────────────┐
-│  3. Playwright Python SDK                            │
-│                                                       │
-│  context = p.chromium.launch_persistent_context(     │
-│      str(profile_dir),                               │
-│      channel="chrome",                               │
-│      headless=False                                  │
-│  )                                                    │
-│  context.on("request", lambda req: ...)  # listener │
-│  context.on("response", lambda res: ...) # listener │
-└──────────┬───────────────────────────────────────────┘
-           │
-           ↓ (Playwright CLI launches actual browser)
-┌──────────────────────────────────────────────────────┐
-│  4. Chromium Browser Launched                        │
-│                                                       │
-│  ┌────────────────────────────────────────────────┐  │
-│  │  Chromium (Persistent Profile)                 │  │
-│  │  • Session cookies loaded from profile         │  │
-│  │  • Already authenticated                       │  │
-│  │  • Network listener attached (via CDP)         │  │
-│  │  • All requests/responses intercepted          │  │
-│  └────────────────────────────────────────────────┘  │
-└──────────┬───────────────────────────────────────────┘
-           │
-           ↓
-┌──────────────────────────────────────────────────────┐
-│  5. User Performs Actions in Browser                 │
-│                                                       │
-│  • Click "Send message"                              │
-│  • Search for "project"                              │
-│  • Upload file                                       │
-│  • React to message                                  │
-└──────────┬───────────────────────────────────────────┘
-           │
-           ↓ (each action triggers API calls)
-┌──────────────────────────────────────────────────────┐
-│  6. Playwright Intercepts All Traffic                │
-│                                                       │
-│  For each request matching filter "/api":            │
-│    • Extract: method, URL, headers, body             │
-│    • Extract: auth tokens from headers/cookies       │
-│    • Write to: /tmp/slack_traffic.jsonl              │
-│                                                       │
-│  {"type": "request",                                 │
-│   "method": "POST",                                  │
-│   "url": "https://slack.com/api/chat.postMessage",   │
-│   "request_headers": {                               │
-│     "authorization": "Bearer xoxc-...",              │
-│     "cookie": "d=xoxd-..."                           │
-│   },                                                 │
-│   "post_data": "{\"channel\":\"C123\"...}"}          │
-└──────────┬───────────────────────────────────────────┘
-           │
-           ↓ (user closes browser or script times out)
-┌──────────────────────────────────────────────────────┐
-│  7. Agent Analyzes JSONL Output                      │
-│                                                       │
-│  Reads: /tmp/slack_traffic.jsonl                     │
-│                                                       │
-│  • Identifies auth pattern (Bearer xoxc token)       │
-│  • Extracts replayable endpoints                     │
-│  • Documents request/response formats                │
-│  • Writes connection-session-cookie.md               │
-│                                                       │
-│  Now the agent knows:                                │
-│  • How to extract auth from the profile              │
-│  • What APIs are available                           │
-│  • What headers/body formats are needed              │
-└──────────────────────────────────────────────────────┘
-```
+*Editable source: [traffic-sniffer-flow.drawio](assets/diagrams/traffic-sniffer-flow.drawio)*
 
 **Key Components**:
 - **traffic_sniffer.py**: Python wrapper that orchestrates the discovery
@@ -397,112 +156,16 @@ Specialized agents are AI agents with focused responsibilities. They share the s
 The incident investigation agent system demonstrates the full power of this architecture. When investigating a production incident, a coordinator agent decomposes the problem and delegates to specialist agents:
 
 **Architecture**:
-```
-                    Incident Investigation Flow
-                    ═══════════════════════════
 
-User Input
-  ↓
-  service: api-gateway
-  env: production                    ┌─────────────────────────┐
-  symptom: high-latency      ───────→│  incident-coordinator   │
-  window: last-2h                    │   (orchestrator)        │
-                                     └───────────┬─────────────┘
-                                                 │
-                    ┌────────────────────────────┼────────────────────────┐
-                    │                            │                        │
-                    ↓                            ↓                        ↓
-        ┌───────────────────┐      ┌───────────────────┐    ┌───────────────────┐
-        │ metrics-analyst   │      │   log-analyst     │    │ runbook-analyst   │
-        │                   │      │                   │    │                   │
-        │ Queries:          │      │ Queries:          │    │ Searches:         │
-        │ • Grafana         │      │ • Kibana          │    │ • Confluence      │
-        │ • CPU/Memory      │      │ • Error logs      │    │ • Known issues    │
-        │ • Restart count   │      │ • Stack traces    │    │ • Runbooks        │
-        │ • Latency panels  │      │ • Warn messages   │    │ • Past incidents  │
-        └─────────┬─────────┘      └─────────┬─────────┘    └─────────┬─────────┘
-                  │                          │                         │
-                  │ Evidence                 │ Evidence                │ Context
-                  │ • p95 latency: 2.3s      │ • OOM errors: 47        │ • Similar incident
-                  │ • Memory: 95%            │ • Connection timeouts   │   from last month
-                  │ • Restarts: 12           │ • Request spike at 14:23│ • Known memory leak
-                  │                          │                         │
-                  └──────────────────────────┼─────────────────────────┘
-                                             │
-                                             ↓
-                              ┌──────────────────────────┐
-                              │  incident-reporter       │
-                              │  (synthesis)             │
-                              │                          │
-                              │  Produces:               │
-                              │  • Timeline              │
-                              │  • Evidence summary      │
-                              │  • Likely causes         │
-                              │  • Recommended actions   │
-                              │  • Structured MD report  │
-                              └──────────┬───────────────┘
-                                         │
-                                         ↓
-                              reports/api-gateway-20260324T143000Z-report.md
-```
+![Incident investigation flow — coordinator delegates to specialists, reporter synthesizes](assets/diagrams/incident-investigation-flow.drawio.png)
+
+*Editable source: [incident-investigation-flow.drawio](assets/diagrams/incident-investigation-flow.drawio)*
 
 **Execution Flow**:
 
-```
-Timeline View (Parallel Execution)
-═══════════════════════════════════
+![Incident timeline — parallel specialist execution](assets/diagrams/incident-parallel-timeline.drawio.png)
 
-Time →
-0s    ┌──────────────────────────────────────────────────────────┐
-      │ incident-coordinator starts                              │
-      │ • Parses incident parameters                             │
-      │ • Determines symptom class: high-latency                 │
-      │ • Creates investigation ID: api-gateway-20260324T143000Z │
-      │ • Creates scratchpad directory                           │
-      └────────────────────┬─────────────────────────────────────┘
-                           │
-5s                         ├─ Spawns subagents in parallel ─────┐
-                           │                                     │
-      ┌────────────────────┼──────────────┐  ┌─────────────────┼─────────┐
-      │ metrics-analyst    │              │  │ log-analyst     │         │
-      │ RUNNING           │              │  │ RUNNING         │         │
-      └────────────────────┼──────────────┘  └─────────────────┼─────────┘
-                           │                                     │
-30s                        │ [Gathering evidence...]             │
-                           │                                     │
-45s   ┌────────────────────┼──────────────┐  ┌─────────────────┼─────────┐
-      │ metrics-analyst    │              │  │ log-analyst     │         │
-      │ COMPLETE          │              │  │ COMPLETE         │         │
-      │ wrote: metrics.md  │              │  │ wrote: logs.md  │         │
-      └────────────────────┼──────────────┘  └─────────────────┼─────────┘
-                           │                                     │
-                           └──────── Evidence gathered ──────────┘
-                                             │
-50s                        ┌─────────────────┼─────────────┐
-                           │ runbook-analyst │             │
-                           │ RUNNING         │             │
-                           └─────────────────┼─────────────┘
-                                             │
-70s                        ┌─────────────────┼─────────────┐
-                           │ runbook-analyst │             │
-                           │ COMPLETE        │             │
-                           │ wrote: runbook.md             │
-                           └─────────────────┼─────────────┘
-                                             │
-                           ┌─────────────────▼─────────────┐
-75s                        │ incident-reporter             │
-                           │ RUNNING                       │
-                           │ • Reads all evidence          │
-                           │ • Synthesizes findings        │
-                           │ • Generates structured report │
-                           └─────────────────┬─────────────┘
-                                             │
-90s                        ┌─────────────────▼─────────────┐
-                           │ incident-reporter             │
-                           │ COMPLETE                      │
-                           │ wrote: final-report.md        │
-                           └───────────────────────────────┘
-```
+*Editable source: [incident-parallel-timeline.drawio](assets/diagrams/incident-parallel-timeline.drawio)*
 
 **How it works**:
 
@@ -653,54 +316,9 @@ The threat model is **identical to you doing it manually**:
 
 **Your personal browser is completely separate from the agent's browser:**
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Your Laptop                                   │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │  Your Personal Browser (Chrome/Firefox/Safari)         │    │
-│  │                                                         │    │
-│  │  Profile: ~/Library/Application Support/Chrome/Default/│    │
-│  │  ┌──────────────────────────────────────────────────┐  │    │
-│  │  │  Your Personal Data (NEVER accessible to agent) │  │    │
-│  │  │  • Personal Gmail cookies                        │  │    │
-│  │  │  • Amazon account                                │  │    │
-│  │  │  • Banking credentials                           │  │    │
-│  │  │  • Facebook session                              │  │    │
-│  │  │  • Saved passwords                               │  │    │
-│  │  │  • Browsing history                              │  │    │
-│  │  │  • Bookmarks                                     │  │    │
-│  │  │  • Extensions                                    │  │    │
-│  │  └──────────────────────────────────────────────────┘  │    │
-│  └────────────────────────────────────────────────────────┘    │
-│                                                                  │
-│                    ⬇ ISOLATED ⬇                                 │
-│                 No shared cookies                                │
-│                 No shared storage                                │
-│                 No shared sessions                               │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │  Agent's Dedicated Browser (Playwright Chromium)       │    │
-│  │                                                         │    │
-│  │  Profile: ~/.browser_automation/agent_profile/         │    │
-│  │  ┌──────────────────────────────────────────────────┐  │    │
-│  │  │  Work Tool Sessions ONLY (agent has access)      │  │    │
-│  │  │  • Slack workspace session                       │  │    │
-│  │  │  • Jira session (SSO)                            │  │    │
-│  │  │  • GitHub Enterprise session                     │  │    │
-│  │  │  • Grafana session                               │  │    │
-│  │  │  • Confluence session                            │  │    │
-│  │  │                                                   │  │    │
-│  │  │  NO personal cookies                             │  │    │
-│  │  │  NO saved passwords                              │  │    │
-│  │  │  NO browsing history (work only)                 │  │    │
-│  │  └──────────────────────────────────────────────────┘  │    │
-│  └────────────────────────────────────────────────────────┘    │
-│                                                                  │
-│  The agent NEVER sees your personal browser data.               │
-│  You explicitly sign into work tools in the agent's browser.    │
-└─────────────────────────────────────────────────────────────────┘
-```
+![Browser profile isolation — personal browser vs agent Playwright profile](assets/diagrams/browser-profile-isolation.drawio.png)
+
+*Editable source: [browser-profile-isolation.drawio](assets/diagrams/browser-profile-isolation.drawio)*
 
 **Key security properties**:
 
@@ -965,69 +583,9 @@ All write actions require explicit approval:
 
 ### System Overview
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                            User's Laptop                                 │
-│                                                                          │
-│  ┌────────────────────────────────────────────────────────────────┐    │
-│  │  AI Coding Agent (Cursor / Claude Code / Codex)                │    │
-│  │  • Reads markdown workflows                                    │    │
-│  │  • Spawns subagents                                            │    │
-│  │  • Executes tool calls                                         │    │
-│  └───────────────────────────┬────────────────────────────────────┘    │
-│                               │                                          │
-│  ┌───────────────────────────▼────────────────────────────────────┐    │
-│  │  Auto Pilot Agent Runtime                                      │    │
-│  │                                                                 │    │
-│  │  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────┐ │    │
-│  │  │ Workflows        │  │ Subagents        │  │ Hooks        │ │    │
-│  │  │ • .md files      │  │ • .md configs    │  │ • Safety     │ │    │
-│  │  │ • Instructions   │  │ • Permissions    │  │ • Validation │ │    │
-│  │  └──────────────────┘  └──────────────────┘  └──────────────┘ │    │
-│  │                                                                 │    │
-│  │  ┌─────────────────────────────────────────────────────────┐  │    │
-│  │  │ Tool Connection Layer                                   │  │    │
-│  │  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐           │  │    │
-│  │  │  │ Slack  │ │  Jira  │ │ GitHub │ │Grafana │ ...       │  │    │
-│  │  │  └───┬────┘ └───┬────┘ └───┬────┘ └───┬────┘           │  │    │
-│  │  │      └──────────┴──────────┴──────────┴─────┐           │  │    │
-│  │  │                                              │           │  │    │
-│  │  │  ┌───────────────────────────────────────────▼────────┐ │  │    │
-│  │  │  │ session_request.py                               │ │  │    │
-│  │  │  │ • Loads browser profile                          │ │  │    │
-│  │  │  │ • Extracts auth tokens                           │ │  │    │
-│  │  │  │ • Makes authenticated API calls                  │ │  │    │
-│  │  │  └──────────────────────────────────────────────────┘ │  │    │
-│  │  └─────────────────────────────────────────────────────────┘  │    │
-│  │                                                                 │    │
-│  │  ┌─────────────────────────────────────────────────────────┐  │    │
-│  │  │ Browser Session Infrastructure                          │  │    │
-│  │  │                                                          │  │    │
-│  │  │  ~/.browser_automation/agent_profile/                  │  │    │
-│  │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐               │  │    │
-│  │  │  │ Cookies  │ │  Tokens  │ │   CSRF   │               │  │    │
-│  │  │  └──────────┘ └──────────┘ └──────────┘               │  │    │
-│  │  │                                                          │  │    │
-│  │  │  ~/.auto-pilot-agent/                                  │  │    │
-│  │  │  ┌──────────────┐ ┌──────────────┐                     │  │    │
-│  │  │  │ .env         │ │ personal/    │                     │  │    │
-│  │  │  │ (base URLs)  │ │ (your tools) │                     │  │    │
-│  │  │  └──────────────┘ └──────────────┘                     │  │    │
-│  │  └─────────────────────────────────────────────────────────┘  │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-│                                                                          │
-│                               │ Authenticated calls                      │
-│                               ↓                                          │
-└───────────────────────────────┼──────────────────────────────────────────┘
-                                │
-    ┌───────────────────────────┼───────────────────────────┐
-    │                           │                           │
-    ↓                           ↓                           ↓
-┌─────────┐               ┌─────────┐                 ┌─────────┐
-│ Slack   │               │  Jira   │                 │ Grafana │
-│ API     │               │  API    │                 │  API    │
-└─────────┘               └─────────┘                 └─────────┘
-```
+![System overview — coding agent, runtime, tool connections, and external APIs](assets/diagrams/system-overview.drawio.png)
+
+*Editable source: [system-overview.drawio](assets/diagrams/system-overview.drawio)*
 
 ### 1. Persistent Browser Profiles
 
@@ -1060,43 +618,10 @@ def open_persistent_browser(profile_dir: Path):
 ```
 
 **The Flow**:
-```
-┌─────────────────────────────────────────────────┐
-│  1. Python script calls Playwright SDK         │
-│     sync_playwright().chromium.launch_...       │
-└────────────┬────────────────────────────────────┘
-             │
-             ↓
-┌─────────────────────────────────────────────────┐
-│  2. Playwright SDK invokes Playwright CLI      │
-│     Uses browser binary from:                   │
-│     ~/.cache/ms-playwright/chromium-*/          │
-└────────────┬────────────────────────────────────┘
-             │
-             ↓
-┌─────────────────────────────────────────────────┐
-│  3. Chromium launches with persistent profile  │
-│     --user-data-dir=~/.browser_automation/...  │
-│                                                 │
-│     Profile contains:                           │
-│     • Cookies (session_id, auth tokens)        │
-│     • Local Storage (JWT tokens, preferences)  │
-│     • IndexedDB (offline data)                 │
-│     • Service Workers (cached assets)          │
-└────────────┬────────────────────────────────────┘
-             │
-             ↓
-┌─────────────────────────────────────────────────┐
-│  4. User signs in once (SSO, OAuth, etc.)      │
-│     Session saved to profile automatically      │
-└────────────┬────────────────────────────────────┘
-             │
-             ↓
-┌─────────────────────────────────────────────────┐
-│  5. Future runs reuse the same profile         │
-│     Already authenticated - no re-login needed  │
-└─────────────────────────────────────────────────┘
-```
+
+![Persistent browser profile flow — Playwright SDK to saved session](assets/diagrams/persistent-browser-flow.drawio.png)
+
+*Editable source: [persistent-browser-flow.drawio](assets/diagrams/persistent-browser-flow.drawio)*
 
 All tools share one profile. Sign in once per tool, sessions persist for days/weeks.
 
@@ -1165,145 +690,9 @@ The entire browser session infrastructure is built on Playwright because it prov
 
 **Authentication Flow Diagram**
 
-```
-How Browser Session Authentication Works (Playwright-based)
-═══════════════════════════════════════════════════════════
+![Session-backed API authentication — setup phase and runtime phase](assets/diagrams/session-auth-flow.drawio.png)
 
-SETUP PHASE (Once per tool)
-───────────────────────────
-
-1. User/Agent runs: python3 tool_connections/slack/sso.py
-
-         ┌──────────────────────────────────────────┐
-         │  Python script (sso.py)                  │
-         │  from playwright.sync_api import ...     │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓ imports Playwright SDK
-         ┌──────────────────────────────────────────┐
-         │  Playwright Python SDK                   │
-         │  p.chromium.launch_persistent_context()  │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓ calls Playwright CLI
-         ┌──────────────────────────────────────────┐
-         │  Playwright CLI                          │
-         │  Launches Chromium binary:               │
-         │  ~/.cache/ms-playwright/chromium-*/      │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓ opens browser
-         ┌──────────────────────────────────────────┐
-         │  Chromium with Persistent Profile        │
-         │  --user-data-dir=~/.browser_automation/  │
-         │        agent_profile/                    │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓
-         ┌──────────────────────────────────────────┐
-         │  User signs in (SSO/OAuth/Password)      │
-         │  • Company SSO (e.g., Okta, Azure AD)    │
-         │  • OAuth flow (e.g., "Sign in with")     │
-         │  • Username/password                      │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓
-         ┌──────────────────────────────────────────┐
-         │  Chromium Saves Session to Profile       │
-         │                                           │
-         │  Saved to ~/.browser_automation/:         │
-         │  • Cookies file (session_id, tokens)      │
-         │  • Local Storage (JWT, preferences)       │
-         │  • IndexedDB (offline data)               │
-         │  • Service Worker cache                   │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓
-         ┌──────────────────────────────────────────┐
-         │  Session persists for days/weeks         │
-         │  • No re-auth needed                      │
-         │  • Survives laptop restarts               │
-         │  • Shared across all Playwright runs      │
-         └──────────────────────────────────────────┘
-
-
-RUNTIME PHASE (Every API call)
-───────────────────────────────
-
-Agent calls: tool_request("slack", "GET", "https://api.slack.com/users.list")
-
-         ┌──────────────────────────────────────────┐
-         │  session_request.py                      │
-         │  from playwright.sync_api import ...     │
-         │  1. Opens persistent context             │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓ Playwright SDK
-         ┌──────────────────────────────────────────┐
-         │  Playwright CLI launches Chromium        │
-         │  • Loads profile from disk               │
-         │  • All cookies/storage restored          │
-         │  • headless=True (background mode)       │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓
-         ┌──────────────────────────────────────────┐
-         │  Warmup (Optional)                        │
-         │  page.goto(warmup_url)                    │
-         │  • Loads SPA, runs init scripts           │
-         │  • Refreshes short-lived tokens           │
-         │  • Triggers any session validation        │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓
-         ┌──────────────────────────────────────────┐
-         │  Extract Auth from Browser Context        │
-         │                                           │
-         │  cookies = context.cookies()              │
-         │                                           │
-         │  Slack example:                           │
-         │  • Cookie: d=...xoxc...                  │
-         │  • Extract xoxc token from cookie         │
-         │  • Add to Authorization header            │
-         │                                           │
-         │  Confluence example:                      │
-         │  • Cookie: cloud.session.token=...       │
-         │  • Extract CSRF from cookie               │
-         │  • Add X-Atlassian-Token header           │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓
-         ┌──────────────────────────────────────────┐
-         │  Make Authenticated API Call              │
-         │                                           │
-         │  Option 1: Via page.evaluate() [safer]   │
-         │    response = page.evaluate("""          │
-         │      () => fetch('/api/users.list', {    │
-         │        headers: {...}                     │
-         │      }).then(r => r.json())               │
-         │    """)                                   │
-         │                                           │
-         │  Option 2: Via context.request [faster]  │
-         │    response = context.request.get(       │
-         │      "https://api.slack.com/users.list", │
-         │      headers={"Authorization": ...}      │
-         │    )                                      │
-         └────────────────┬─────────────────────────┘
-                          │
-                          ↓
-         ┌──────────────────────────────────────────┐
-         │  Return Response                          │
-         │                                           │
-         │  {                                        │
-         │    "ok": true,                            │
-         │    "status": 200,                         │
-         │    "json": {...},                         │
-         │    "headers": {...}                       │
-         │  }                                        │
-         └──────────────────────────────────────────┘
-
-         Browser context closed, but profile saved
-```
+*Editable source: [session-auth-flow.drawio](assets/diagrams/session-auth-flow.drawio)*
 
 ### 3. Tool Connection as Executable Docs
 
@@ -1343,65 +732,9 @@ The agent reads this file and knows:
 
 **Agent Lifecycle & Context Isolation**
 
-```
-                        Subagent Context Isolation
-                        ═════════════════════════
+![Subagent context isolation — parent coordinator vs isolated child sessions](assets/diagrams/subagent-context-isolation.drawio.png)
 
-┌──────────────────────────────────────────────────────────────────┐
-│  Parent Session (incident-coordinator)                           │
-│                                                                   │
-│  Context:                                                        │
-│  • Full conversation history                                     │
-│  • User's original request                                       │
-│  • Previous subagent results                                     │
-│  • Coordinator's reasoning                                       │
-│                                                                   │
-│  Spawns subagent ──────────────────────────────────┐            │
-└────────────────────────────────────────────────────┼─────────────┘
-                                                      │
-                                                      │ Task only
-                                                      ↓
-              ┌─────────────────────────────────────────────────┐
-              │  Child Session (metrics-analyst)                │
-              │                                                  │
-              │  Context: ISOLATED                              │
-              │  • Receives ONLY the task prompt                │
-              │  • No parent conversation                       │
-              │  • No other subagent results                    │
-              │  • No coordinator context                       │
-              │                                                  │
-              │  Tools: SCOPED                                  │
-              │  • Read                                         │
-              │  • Write (scratchpad only)                      │
-              │  • Bash (read-only commands)                    │
-              │  • AskUserQuestion                              │
-              │  ✗ No Agent (can't spawn sub-subagents)        │
-              │  ✗ No git push                                  │
-              │  ✗ No terraform apply                           │
-              │                                                  │
-              │  Execution:                                     │
-              │  1. Reads Grafana dashboards                    │
-              │  2. Writes findings to scratchpad/metrics.md    │
-              │  3. Returns summary                             │
-              │                                                  │
-              └──────────────────────┬──────────────────────────┘
-                                     │
-                                     │ Results only
-                                     ↓
-┌──────────────────────────────────────────────────────────────────┐
-│  Parent Session (incident-coordinator)                           │
-│                                                                   │
-│  Receives:                                                       │
-│  • Subagent summary                                              │
-│  • Path to scratchpad file                                       │
-│  • Status (success/failure)                                      │
-│                                                                   │
-│  Can now:                                                        │
-│  • Read scratchpad/metrics.md for details                        │
-│  • Spawn next subagent                                           │
-│  • Aggregate findings                                            │
-└──────────────────────────────────────────────────────────────────┘
-```
+*Editable source: [subagent-context-isolation.drawio](assets/diagrams/subagent-context-isolation.drawio)*
 
 Each specialized agent:
 - Runs in **isolated context** (doesn't see parent conversation)
@@ -1425,67 +758,9 @@ One of the key innovations in the Auto Pilot Agent architecture is a **generic p
 
 **The Solution: Scratchpad + Brief Pattern**
 
-```
-Multi-Agent Communication Architecture
-═══════════════════════════════════════
+![Scratchpad and brief pattern — multi-agent communication architecture](assets/diagrams/scratchpad-brief-pattern.drawio.png)
 
-┌────────────────────────────────────────────────────────┐
-│  Coordinator Agent                                     │
-│                                                         │
-│  Maintains:                                             │
-│  • Structured Finding Brief (coordinator-brief.md)     │
-│  • Current working status                              │
-│  • Confirmed evidence (with citations)                 │
-│  • Ruled out hypotheses                                │
-│  • Unknowns/gaps                                       │
-│  • Next step plan                                      │
-└────────────┬───────────────────────────────────────────┘
-             │
-             │ Step 1: Delegates with brief + scratchpad paths
-             │
-             ├──────────────────┬─────────────────────────┐
-             │                  │                         │
-             ↓                  ↓                         ↓
-┌────────────────────┐ ┌────────────────┐ ┌─────────────────┐
-│ Specialist Agent 1 │ │ Specialist     │ │ Specialist      │
-│ (metrics-analyst)  │ │ Agent 2        │ │ Agent 3         │
-│                    │ │ (log-analyst)  │ │ (runbook-       │
-│ Receives:          │ │                │ │  analyst)       │
-│ • Brief (context)  │ │ Receives:      │ │                 │
-│ • Specific task    │ │ • Brief        │ │ Receives:       │
-│ • Output path:     │ │ • Specific task│ │ • Brief         │
-│   step1-metrics.md │ │ • Output path: │ │ • Specific task │
-│                    │ │   step1-logs.md│ │ • Output path:  │
-│ Writes findings to │ │                │ │   step1-        │
-│ scratchpad         │ │ Writes findings│ │   runbook.md    │
-└────────────────────┘ └────────────────┘ └─────────────────┘
-             │                  │                         │
-             │ Returns summary  │                         │
-             │                  │                         │
-             └──────────────────┴─────────────────────────┘
-                                │
-                                ↓
-┌────────────────────────────────────────────────────────┐
-│  Coordinator Agent                                     │
-│                                                         │
-│  After Step 1:                                          │
-│  1. Reads all scratchpads:                             │
-│     • step1-metrics.md                                 │
-│     • step1-logs.md                                    │
-│     • step1-runbook.md                                 │
-│                                                         │
-│  2. Updates coordinator-brief.md:                      │
-│     • Folds findings into "Confirmed evidence"         │
-│     • Adds to "Ruled out" or "Unknowns"                │
-│     • Preserves citations from scratchpads             │
-│     • Plans next step                                  │
-│                                                         │
-│  3. Delegates Step 2 (if needed):                      │
-│     • Includes updated brief                           │
-│     • Points to relevant prior scratchpads             │
-│     • Assigns new output paths (step2-*.md)            │
-└────────────────────────────────────────────────────────┘
-```
+*Editable source: [scratchpad-brief-pattern.drawio](assets/diagrams/scratchpad-brief-pattern.drawio)*
 
 **Workspace Layout**:
 ```
@@ -1661,66 +936,9 @@ This pattern enables **complex multi-step reasoning** across multiple specialize
 
 **Hook Execution Flow**
 
-```
-Tool Call Lifecycle with Hooks
-═══════════════════════════════
+![Tool call lifecycle with hooks — PreToolUse, execution, subagent audit, Stop validation](assets/diagrams/hook-execution-flow.drawio.png)
 
-User or Agent requests tool call
-         │
-         ↓
-┌────────────────────────┐
-│ PreToolUse Hook        │ ◄─── .agents/hooks/block_unsafe_shell.py
-│                        │      .agents/hooks/check-git-author.sh
-│ Checks:                │
-│ ✓ No git push         │
-│ ✓ No terraform apply   │
-│ ✓ No helm upgrade      │
-│ ✓ Git author is set    │
-└────────┬───────────────┘
-         │
-         ├─ DENIED ──→ Error returned to agent
-         │
-         ↓ ALLOWED
-┌────────────────────────┐
-│ Tool Executes          │
-│                        │
-│ Bash("curl api...")    │
-│ Read("file.md")        │
-│ Agent("subagent-name") │ ────┐
-└────────┬───────────────┘     │
-         │                      │
-         ↓                      ↓
-┌────────────────────────┐     ┌─────────────────────────┐
-│ PostToolUse Hook       │     │ SubagentStart Hook      │ ◄── audit_subagent_lifecycle.py
-│ (if defined)           │     │                         │     Logs: type, timestamp, task
-└────────────────────────┘     │ Records subagent spawn  │
-                               └────────┬────────────────┘
-                                        │
-                                        │ Subagent runs...
-                                        │
-                                        ↓
-                               ┌─────────────────────────┐
-                               │ SubagentStop Hook       │ ◄── audit_subagent_lifecycle.py
-                               │                         │     Logs: completion, output
-                               │ Records completion      │
-                               └─────────────────────────┘
-
-Session ends
-         │
-         ↓
-┌────────────────────────┐
-│ Stop Hook              │ ◄─── validate_final_report.py
-│                        │
-│ Validates:             │      Checks for required sections:
-│ ✓ Report has timeline  │      • Incident summary
-│ ✓ Evidence documented  │      • Timeline
-│ ✓ Likely causes listed │      • Evidence
-│ ✓ Required fields set  │      • Likely causes
-│                        │      • Remediation steps
-│ If valid → saves to    │
-│ reports/XXX-report.md  │
-└────────────────────────┘
-```
+*Editable source: [hook-execution-flow.drawio](assets/diagrams/hook-execution-flow.drawio)*
 
 Hooks enforce safety constraints:
 
